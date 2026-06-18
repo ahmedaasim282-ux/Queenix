@@ -668,7 +668,7 @@ const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
     <div class="form-label" style="margin-top:0">Language</div>
     <select class="form-select"><option>English</option><option>العربية</option></select>
   </div>
-  <button class="btn btn-danger" style="width:100%;justify-content:center;margin-top:20px" onclick="toast('Logged out','success');toggleSettings()"><i class="ti ti-logout"></i> Log out</button>
+  <button class="btn btn-danger" style="width:100%;justify-content:center;margin-top:20px" onclick="doSignOut()"><i class="ti ti-logout"></i> Log out</button>
 </div>
 
 <!-- MODALS -->
@@ -1070,6 +1070,11 @@ function toggleNotif(){
 function toggleSettings(){
   var p=document.getElementById('settings-panel'),n=document.getElementById('notif-panel');
   n.classList.remove('open'); p.classList.toggle('open');
+}
+async function doSignOut(){
+  await _sb.auth.signOut();
+  sessionStorage.clear();
+  window.location.replace('/');
 }
 
 // ─── QR TIMER ───────────────────────────────────────────
