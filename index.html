@@ -597,9 +597,9 @@ async function doLogin() {
     showToast('Welcome, ' + name + '!', 'success');
     setTimeout(function() {
       if (role === 'owner' || role === 'ops') {
-        window.location.href = 'admin.html?role=' + role;
+        window.location.href = '/admin?role=' + role;
       } else {
-        window.location.href = 'member.html';
+        window.location.href = '/member';
       }
     }, 600);
   } catch(e) {

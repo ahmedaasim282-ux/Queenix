@@ -306,7 +306,7 @@ const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
 // ── Session guard: redirect to login if not signed in ──
 (async function() {
   const { data: { session } } = await _sb.auth.getSession();
-  if (!session) { window.location.replace('index.html'); return; }
+  if (!session) { window.location.replace('/'); return; }
   const meta  = session.user.user_metadata || {};
   const role  = meta.role || 'member';
   const name  = meta.full_name || session.user.email;
@@ -315,7 +315,7 @@ const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
   sessionStorage.setItem('qx_name', name);
   // Non-members should not be here
   if (role === 'owner' || role === 'ops') {
-    window.location.replace('admin.html?role=' + role);
+    window.location.replace('/admin?role=' + role);
     return;
   }
   // Update UI with real name
@@ -341,7 +341,7 @@ const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
         if(confirm('Sign out of Queenix?')){
           await _sb.auth.signOut();
           sessionStorage.clear();
-          window.location.replace('index.html');
+          window.location.replace('/');
         }
       };
       navRight.insertBefore(lb, navRight.firstChild);
