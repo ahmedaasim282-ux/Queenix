@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queenix — Sign in</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root{
+  --black:#080808;--dark:#0F0F0F;--card:#161616;--card2:#1E1E1E;--card3:#242424;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --blue:#1E90FF;--blue-d:#0D6FD8;--blue-l:#5BB3FF;
+  --blue-bg:rgba(30,144,255,0.10);--blue-bd:rgba(30,144,255,0.28);
+  --white:#FFF;--g1:#DADADA;--g2:#909090;--g3:#505050;
+  --gold:#F59E0B;--gold-bg:rgba(245,158,11,0.10);--gold-bd:rgba(245,158,11,0.28);
+  --success:#22C55E;--success-bg:rgba(34,197,94,0.10);--success-bd:rgba(34,197,94,0.28);
+  --danger:#EF4444;--danger-bg:rgba(239,68,68,0.10);--danger-bd:rgba(239,68,68,0.28);
+  --fd:'Rajdhani',system-ui,sans-serif;--fb:'Inter',system-ui,sans-serif;
+  --r:10px;--r-sm:6px;--r-lg:14px;--r-xl:20px;--r-pill:99px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:var(--fb);background:var(--black);color:var(--g1);font-size:14px;overflow-x:hidden;}
+button,input{font-family:var(--fb);}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;}
+
+/* ─── PORTAL SELECT SCREEN ─── */
+#s-select{
+  flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% -10%, rgba(30,144,255,0.10) 0%, transparent 55%), var(--black);
+  padding:32px 20px;gap:8px;
+}
+.sel-logo{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.sel-logo-name{font-family:var(--fd);font-size:38px;font-weight:700;color:var(--white);letter-spacing:0.08em;}
+.sel-logo-sub{font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--g3);margin-top:1px;}
+.sel-subtitle{font-size:14px;color:var(--g2);margin-bottom:36px;}
+.portal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:780px;width:100%;}
+.portal-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:28px 20px;text-align:center;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;overflow:hidden;}
+.portal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity 0.2s;}
+.portal-card.blue-c::before{background:var(--blue);}
+.portal-card.gold-c::before{background:var(--gold);}
+.portal-card.green-c::before{background:var(--success);}
+.portal-card:hover{transform:translateY(-3px);}
+.portal-card.blue-c:hover{border-color:var(--blue-bd);background:var(--blue-bg);}
+.portal-card.gold-c:hover{border-color:var(--gold-bd);background:var(--gold-bg);}
+.portal-card.green-c:hover{border-color:var(--success-bd);background:var(--success-bg);}
+.portal-card:hover::before{opacity:1;}
+.p-ico{width:62px;height:62px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:28px;}
+.p-ico.blue{background:var(--blue-bg);color:var(--blue);}
+.p-ico.gold{background:var(--gold-bg);color:var(--gold);}
+.p-ico.green{background:var(--success-bg);color:var(--success);}
+.p-label{font-family:var(--fd);font-size:20px;font-weight:700;color:var(--white);letter-spacing:0.04em;}
+.p-desc{font-size:12px;color:var(--g3);line-height:1.6;}
+.p-access{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:4px;}
+.p-access-row{display:flex;align-items:center;gap:6px;font-size:11px;text-align:left;}
+.p-access-row.yes{color:var(--g2);}
+.p-access-row.no{color:var(--g3);}
+.p-access-row i{font-size:12px;flex-shrink:0;}
+.p-access-row.yes i{color:var(--blue);}
+.p-access-row.gold-row i{color:var(--gold);}
+.p-access-row.green-row i{color:var(--success);}
+.p-access-row.no i{color:var(--g3);}
+.p-arrow{font-size:18px;color:var(--g3);transition:color 0.2s;}
+.portal-card.blue-c:hover .p-arrow{color:var(--blue);}
+.portal-card.gold-c:hover .p-arrow{color:var(--gold);}
+.portal-card.green-c:hover .p-arrow{color:var(--success);}
+
+/* ─── LOGIN SCREEN ─── */
+#s-login{flex-direction:row;}
+.login-left{
+  flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:48px 40px;border-right:1px solid var(--border);
+  background:radial-gradient(ellipse at 20% 50%, rgba(30,144,255,0.07) 0%, transparent 55%), var(--dark);
+  min-width:0;
+}
+.ll-logo{display:flex;align-items:center;gap:10px;margin-bottom:44px;}
+.ll-logo-name{font-family:var(--fd);font-size:28px;font-weight:700;color:var(--white);letter-spacing:0.08em;}
+.ll-logo-sub{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--g3);margin-top:1px;}
+.ll-panel{width:100%;max-width:380px;}
+
+/* Role comparison panel */
+.role-title{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--g3);margin-bottom:12px;}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.compare-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;}
+.cc-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.cc-ico{width:32px;height:32px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.cc-name{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--white);letter-spacing:0.03em;}
+.cc-role{font-size:10px;color:var(--g3);}
+.cc-item{display:flex;align-items:center;gap:6px;font-size:11px;padding:3px 0;}
+.cc-item.yes{color:var(--g1);}
+.cc-item.no{color:var(--g3);}
+.cc-item i{font-size:12px;flex-shrink:0;}
+
+/* single role visual */
+.role-card-single{background:var(--card);border:1px solid var(--border);border-radius:var(--r-xl);padding:22px;}
+.rc-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.rc-ico{width:46px;height:46px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.rc-name{font-family:var(--fd);font-size:20px;font-weight:700;color:var(--white);letter-spacing:0.04em;}
+.rc-role{font-size:12px;color:var(--g3);margin-top:1px;}
+.rc-perms{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.rc-perm{display:flex;align-items:center;gap:6px;font-size:12px;padding:4px 0;}
+.rc-perm.yes{color:var(--g1);}
+.rc-perm.no{color:var(--g3);}
+.rc-perm i{font-size:13px;flex-shrink:0;}
+
+/* creds hint */
+.creds-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px;margin-top:14px;}
+.creds-title{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--g3);margin-bottom:10px;}
+.cred-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);}
+.cred-row:last-child{border-bottom:none;}
+.cred-label{font-size:11px;color:var(--g2);}
+.cred-val{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--white);font-family:monospace;}
+.copy-btn{font-size:10px;color:var(--blue);cursor:pointer;padding:2px 7px;border:1px solid var(--blue-bd);border-radius:4px;background:transparent;font-family:var(--fb);}
+.copy-btn:hover{background:var(--blue-bg);}
+
+/* RIGHT: Form */
+.login-right{width:420px;flex-shrink:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:48px 40px;}
+.lr-inner{width:100%;max-width:340px;}
+.back-btn{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--g2);cursor:pointer;margin-bottom:28px;transition:color 0.15s;background:none;border:none;padding:0;}
+.back-btn:hover{color:var(--white);}
+.role-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:var(--r-pill);font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;margin-bottom:14px;}
+.role-badge.owner{background:var(--gold-bg);border:1px solid var(--gold-bd);color:var(--gold);}
+.role-badge.ops{background:var(--blue-bg);border:1px solid var(--blue-bd);color:var(--blue-l);}
+.role-badge.member{background:var(--success-bg);border:1px solid var(--success-bd);color:var(--success);}
+.login-heading{font-family:var(--fd);font-size:30px;font-weight:700;color:var(--white);letter-spacing:0.04em;margin-bottom:4px;}
+.login-sub{font-size:13px;color:var(--g2);margin-bottom:28px;}
+.fg{margin-bottom:16px;}
+.fl{display:block;font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--g3);margin-bottom:6px;}
+.fi{width:100%;padding:11px 14px;background:var(--card);border:1px solid var(--border2);border-radius:var(--r);font-size:14px;color:var(--white);outline:none;transition:border-color 0.15s;}
+.fi:focus{border-color:var(--blue);}
+.fi::placeholder{color:var(--g3);}
+.fi.error-field{border-color:var(--danger);}
+.pw-wrap{position:relative;}
+.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:17px;color:var(--g3);cursor:pointer;}
+.pw-eye:hover{color:var(--g1);}
+.form-extras{display:flex;justify-content:space-between;align-items:center;margin-top:6px;}
+.caps-warn{font-size:11px;color:var(--gold);display:none;align-items:center;gap:4px;}
+.forgot-link{font-size:11px;color:var(--blue);cursor:pointer;background:none;border:none;padding:0;}
+.forgot-link:hover{text-decoration:underline;}
+.err-box{background:var(--danger-bg);border:1px solid var(--danger-bd);border-radius:var(--r);padding:10px 14px;font-size:13px;color:var(--danger);margin-bottom:16px;display:none;align-items:center;gap:8px;}
+.err-box.show{display:flex;}
+.login-btn{width:100%;padding:13px;border-radius:var(--r);font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;}
+.login-btn.blue{background:var(--blue);color:#fff;}
+.login-btn.blue:hover{background:var(--blue-d);}
+.login-btn.gold{background:var(--gold);color:#000;}
+.login-btn.gold:hover{background:#d97706;}
+.login-btn.green{background:var(--success);color:#fff;}
+.login-btn.green:hover{background:#16a34a;}
+.login-btn:disabled{opacity:0.6;cursor:default;}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-ov.open{opacity:1;pointer-events:all;}
+.modal-box{background:var(--card);border:1px solid var(--border2);border-radius:var(--r-xl);padding:28px;max-width:380px;width:90%;transform:translateY(8px);transition:transform 0.2s;}
+.modal-ov.open .modal-box{transform:none;}
+.m-title{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--white);letter-spacing:0.04em;margin-bottom:4px;}
+.m-sub{font-size:12px;color:var(--g2);margin-bottom:20px;}
+.m-foot{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+.btn-cancel{padding:9px 18px;border-radius:var(--r-pill);background:transparent;color:var(--g2);border:1px solid var(--border2);font-size:13px;cursor:pointer;}
+.btn-send{padding:9px 18px;border-radius:var(--r-pill);background:var(--blue);color:#fff;font-size:13px;font-weight:600;border:none;cursor:pointer;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;z-index:999;background:var(--card2);border:1px solid var(--border2);color:var(--g1);padding:10px 16px;border-radius:var(--r);font-size:13px;transform:translateY(60px);opacity:0;transition:all 0.25s;display:flex;align-items:center;gap:8px;max-width:280px;}
+.toast.show{transform:none;opacity:1;}
+.toast.success{border-color:var(--success-bd);color:var(--success);}
+.toast.error{border-color:var(--danger-bd);color:var(--danger);}
+
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-7px);}40%{transform:translateX(7px);}60%{transform:translateX(-4px);}80%{transform:translateX(4px);}}
+.shake{animation:shake 0.35s ease;}
+
+@media(max-width:820px){
+  .portal-grid{grid-template-columns:1fr;}
+  #s-login{flex-direction:column;}
+  .login-left{padding:28px 20px;flex:none;border-right:none;border-bottom:1px solid var(--border);}
+  .login-right{width:100%;padding:28px 20px;}
+  .compare-grid{grid-template-columns:1fr;}
+}
+</style>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const _SUPABASE_URL  = 'https://xnkupxjffbizkoexttdf.supabase.co';
+  const _SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhua3VweGpmZmJpemtvZXh0dGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjA0OTgsImV4cCI6MjA5NzI5NjQ5OH0.rn6G9kLyGRGe66fUs_aiYPX9NWT-lNFNIihPA7oe4YQ';
+  const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
+</script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 1: PORTAL SELECT
+══════════════════════════════════════════ -->
+<div class="screen active" id="s-select">
+  <div class="sel-logo">
+    <svg width="46" height="46" viewBox="0 0 34 34" fill="none">
+      <rect x="2" y="13" width="4" height="8" rx="1.5" fill="#1E90FF"/>
+      <rect x="28" y="13" width="4" height="8" rx="1.5" fill="#1E90FF"/>
+      <rect x="6" y="10" width="3" height="14" rx="1.5" fill="#1E90FF"/>
+      <rect x="25" y="10" width="3" height="14" rx="1.5" fill="#1E90FF"/>
+      <rect x="9" y="15.5" width="16" height="3" rx="1.5" fill="#1E90FF"/>
+      <rect x="13" y="7" width="3" height="6" rx="1.5" fill="#1E90FF"/>
+      <rect x="18" y="7" width="3" height="6" rx="1.5" fill="#1E90FF"/>
+      <rect x="13" y="21" width="3" height="6" rx="1.5" fill="#1E90FF"/>
+      <rect x="18" y="21" width="3" height="6" rx="1.5" fill="#1E90FF"/>
+    </svg>
+    <div>
+      <div class="sel-logo-name">QUEENIX</div>
+      <div class="sel-logo-sub">Fitness Center · Ladies Only</div>
+    </div>
+  </div>
+  <div class="sel-subtitle">Choose your portal to sign in</div>
+
+  <div class="portal-grid">
+
+    <!-- OWNER -->
+    <div class="portal-card gold-c" onclick="showLogin('owner')">
+      <div class="p-ico gold"><i class="ti ti-crown"></i></div>
+      <div class="p-label">Owner</div>
+      <div class="p-desc">Complete access to all management, staff, and business analytics</div>
+      <div class="p-access">
+        <div class="p-access-row gold-row yes"><i class="ti ti-check"></i>Dashboard & live check-ins</div>
+        <div class="p-access-row gold-row yes"><i class="ti ti-check"></i>Members, classes, coffee & salon</div>
+        <div class="p-access-row gold-row yes"><i class="ti ti-check"></i>Staff management & shifts</div>
+        <div class="p-access-row gold-row yes"><i class="ti ti-check"></i>Revenue, memberships & reports</div>
+      </div>
+      <div class="p-arrow"><i class="ti ti-arrow-right"></i></div>
+    </div>
+
+    <!-- OPERATIONS -->
+    <div class="portal-card blue-c" onclick="showLogin('ops')">
+      <div class="p-ico blue"><i class="ti ti-layout-dashboard"></i></div>
+      <div class="p-label">Operations</div>
+      <div class="p-desc">Daily gym operations — monitoring, check-ins, orders and bookings</div>
+      <div class="p-access">
+        <div class="p-access-row yes"><i class="ti ti-check"></i>Dashboard & live check-ins</div>
+        <div class="p-access-row yes"><i class="ti ti-check"></i>Members, classes, coffee & salon</div>
+        <div class="p-access-row no"><i class="ti ti-x"></i>Staff management & shifts</div>
+        <div class="p-access-row no"><i class="ti ti-x"></i>Revenue, memberships & reports</div>
+      </div>
+      <div class="p-arrow"><i class="ti ti-arrow-right"></i></div>
+    </div>
+
+    <!-- MEMBER -->
+    <div class="portal-card green-c" onclick="showLogin('member')">
+      <div class="p-ico green"><i class="ti ti-user-circle"></i></div>
+      <div class="p-label">Member</div>
+      <div class="p-desc">Your personal gym account — classes, coffee, salon and membership</div>
+      <div class="p-access">
+        <div class="p-access-row green-row yes"><i class="ti ti-check"></i>Home, QR entry & fitness tracker</div>
+        <div class="p-access-row green-row yes"><i class="ti ti-check"></i>Book classes & events</div>
+        <div class="p-access-row green-row yes"><i class="ti ti-check"></i>Coffee shop & hair salon</div>
+        <div class="p-access-row green-row yes"><i class="ti ti-check"></i>Membership & profile settings</div>
+      </div>
+      <div class="p-arrow"><i class="ti ti-arrow-right"></i></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SCREEN 2: LOGIN FORM
+══════════════════════════════════════════ -->
+<div class="screen" id="s-login">
+
+  <!-- LEFT PANEL: role info -->
+  <div class="login-left">
+    <div class="ll-logo">
+      <svg width="36" height="36" viewBox="0 0 34 34" fill="none">
+        <rect x="2" y="13" width="4" height="8" rx="1.5" fill="#1E90FF"/>
+        <rect x="28" y="13" width="4" height="8" rx="1.5" fill="#1E90FF"/>
+        <rect x="6" y="10" width="3" height="14" rx="1.5" fill="#1E90FF"/>
+        <rect x="25" y="10" width="3" height="14" rx="1.5" fill="#1E90FF"/>
+        <rect x="9" y="15.5" width="16" height="3" rx="1.5" fill="#1E90FF"/>
+        <rect x="13" y="7" width="3" height="6" rx="1.5" fill="#1E90FF"/>
+        <rect x="18" y="7" width="3" height="6" rx="1.5" fill="#1E90FF"/>
+        <rect x="13" y="21" width="3" height="6" rx="1.5" fill="#1E90FF"/>
+        <rect x="18" y="21" width="3" height="6" rx="1.5" fill="#1E90FF"/>
+      </svg>
+      <div>
+        <div class="ll-logo-name">QUEENIX</div>
+        <div style="font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--g3);margin-top:1px;">Fitness Center</div>
+      </div>
+    </div>
+    <div class="ll-panel" id="ll-content">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: form -->
+  <div class="login-right">
+    <div class="lr-inner">
+      <button class="back-btn" onclick="backToSelect()">
+        <i class="ti ti-arrow-left"></i> Back to portal select
+      </button>
+      <div id="f-badge"></div>
+      <div class="login-heading" id="f-heading">Welcome back</div>
+      <div class="login-sub" id="f-sub">Sign in to your account</div>
+
+      <div class="err-box" id="err-box">
+        <i class="ti ti-alert-circle"></i>
+        <span id="err-text">Incorrect credentials. Please try again.</span>
+      </div>
+
+      <div class="fg">
+        <label class="fl">Username</label>
+        <input class="fi" id="f-user" type="text" placeholder="Enter your email address" autocomplete="email"
+          onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="fg">
+        <label class="fl">Password</label>
+        <div class="pw-wrap">
+          <input class="fi" id="f-pass" type="password" placeholder="Enter your password" autocomplete="current-password"
+            onkeydown="if(event.key==='Enter')doLogin()"
+            onkeyup="checkCaps(event)">
+          <span class="pw-eye" onclick="togglePw()"><i class="ti ti-eye-off" id="eye-ico"></i></span>
+        </div>
+        <div class="form-extras">
+          <div class="caps-warn" id="caps-warn"><i class="ti ti-alert-triangle" style="font-size:11px"></i> Caps Lock on</div>
+          <button class="forgot-link" onclick="openForgot()">Forgot password?</button>
+        </div>
+      </div>
+
+      <button class="login-btn blue" id="login-btn" onclick="doLogin()">
+        <i class="ti ti-login"></i>
+        <span id="btn-text">Sign in</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal-ov" id="modal-forgot" onclick="if(event.target===this)closeForgot()">
+  <div class="modal-box">
+    <div class="m-title">Reset password</div>
+    <div class="m-sub">Enter your email and we'll send a reset link within 5 minutes.</div>
+    <div class="fg"><label class="fl">Email address</label><input class="fi" id="forgot-email" type="email" placeholder="your@email.com"></div>
+    <div class="m-foot">
+      <button class="btn-cancel" onclick="closeForgot()">Cancel</button>
+      <button class="btn-send" onclick="sendReset()">Send reset link</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i id="t-ico"></i><span id="t-msg"></span></div>
+
+<script>
+// ══════════════════════════════════════════
+// CREDENTIALS — edit here to change logins
+// ══════════════════════════════════════════
+var CREDS = {
+  owner:  { user: 'owner@queenix.com', pass: 'Owner@2026!',  name: 'Aisha Al-Farsi',   title: 'Owner & CEO' },
+  ops:    { user: 'ops@queenix.com',   pass: 'Ops@2026!',    name: 'Fatima Rashid',     title: 'Operations Manager' },
+  member: { user: 'sara@queenix.com',   pass: 'Member@2026!', name: 'Sara Al-Mansoori', title: 'Premium Member' }
+};
+
+// ══════════════════════════════════════════
+// ROLE CONFIG
+// ══════════════════════════════════════════
+var ROLES = {
+  owner: {
+    heading: 'Owner portal',
+    sub: 'Full access to all Queenix management sections',
+    badgeClass: 'role-badge owner',
+    badgeIcon: 'ti-crown',
+    badgeText: 'OWNER',
+    btnClass: 'login-btn gold',
+    redirect: 'queenix-admin-v2.html?role=owner',
+    leftPanel: buildOwnerPanel
+  },
+  ops: {
+    heading: 'Operations login',
+    sub: 'Access to daily operations and monitoring only',
+    badgeClass: 'role-badge ops',
+    badgeIcon: 'ti-layout-dashboard',
+    badgeText: 'OPERATIONS',
+    btnClass: 'login-btn blue',
+    redirect: 'queenix-admin-v2.html?role=ops',
+    leftPanel: buildOpsPanel
+  },
+  member: {
+    heading: 'Member portal',
+    sub: 'Sign in to your Queenix membership account',
+    badgeClass: 'role-badge member',
+    badgeIcon: 'ti-user-circle',
+    badgeText: 'MEMBER',
+    btnClass: 'login-btn green',
+    redirect: 'queenix-member-app.html',
+    leftPanel: buildMemberPanel
+  }
+};
+
+var currentRole = null;
+
+// ══════════════════════════════════════════
+// LEFT PANEL BUILDERS
+// ══════════════════════════════════════════
+function perm(ico, text, yes, col) {
+  var c = yes ? col || 'var(--blue)' : 'var(--g3)';
+  var t = yes ? 'yes' : 'no';
+  return '<div class="rc-perm '+t+'"><i class="ti '+ico+'" style="color:'+c+'"></i>'+text+'</div>';
+}
+
+function credsCard(title, rows) {
+  return '<div class="creds-card"><div class="creds-title">'+title+'</div>' +
+    rows.map(r => '<div class="cred-row"><span class="cred-label">'+r.l+'</span>' +
+      '<span class="cred-val">'+r.v+' <button class="copy-btn" onclick="copyText(\''+r.v+'\')">copy</button></span></div>').join('') +
+    '</div>';
+}
+
+function buildOwnerPanel() {
+  return '<div class="role-title">What you can access</div>' +
+    '<div class="compare-grid">' +
+      // Owner column
+      '<div class="compare-card" style="border-color:var(--gold-bd)">' +
+        '<div class="cc-header"><div class="cc-ico" style="background:var(--gold-bg);color:var(--gold)"><i class="ti ti-crown"></i></div>' +
+        '<div><div class="cc-name">Owner</div><div class="cc-role">Full access</div></div></div>' +
+        ['Dashboard','Live check-ins','Members','Classes','Coffee orders','Salon bookings','Staff management','Shifts & rota','Revenue','Memberships','Reports & analytics']
+          .map(s=>'<div class="cc-item yes"><i class="ti ti-check" style="color:var(--gold)"></i>'+s+'</div>').join('') +
+      '</div>' +
+      // Ops column for comparison
+      '<div class="compare-card">' +
+        '<div class="cc-header"><div class="cc-ico" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-layout-dashboard"></i></div>' +
+        '<div><div class="cc-name">Operations</div><div class="cc-role">Limited access</div></div></div>' +
+        [['Dashboard',true],['Live check-ins',true],['Members',true],['Classes',true],['Coffee orders',true],['Salon bookings',true],['Staff management',false],['Shifts & rota',false],['Revenue',false],['Memberships',false],['Reports & analytics',false]]
+          .map(([s,y])=>'<div class="cc-item '+(y?'yes':'no')+'"><i class="ti '+(y?'ti-check':'ti-x')+'" style="color:'+(y?'var(--blue)':'var(--g3)')+'"></i>'+s+'</div>').join('') +
+      '</div>' +
+    '</div>' +
+    credsCard('Owner credentials', [{l:'Email',v:CREDS.owner.user},{l:'Password',v:CREDS.owner.pass}]);
+}
+
+function buildOpsPanel() {
+  return '<div class="role-title">Operations access</div>' +
+    '<div class="role-card-single" style="border-color:var(--blue-bd);margin-bottom:14px">' +
+      '<div class="rc-header"><div class="rc-ico" style="background:var(--blue-bg);color:var(--blue)"><i class="ti ti-layout-dashboard"></i></div>' +
+      '<div><div class="rc-name">OPERATIONS</div><div class="rc-role">Daily monitoring & management</div></div></div>' +
+      '<div class="rc-perms">' +
+        perm('ti-check','Dashboard',true) +
+        perm('ti-check','Live check-ins',true) +
+        perm('ti-check','Members',true) +
+        perm('ti-check','Classes',true) +
+        perm('ti-check','Coffee orders',true) +
+        perm('ti-check','Salon bookings',true) +
+        perm('ti-x','Staff management',false) +
+        perm('ti-x','Shifts & rota',false) +
+        perm('ti-x','Revenue',false) +
+        perm('ti-x','Memberships',false) +
+        perm('ti-x','Reports',false) +
+      '</div>' +
+    '</div>' +
+    '<div style="background:var(--danger-bg);border:1px solid var(--danger-bd);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--danger);display:flex;align-items:flex-start;gap:8px;margin-bottom:14px;">' +
+      '<i class="ti ti-lock" style="font-size:15px;margin-top:1px;flex-shrink:0"></i>' +
+      '<span>Staff management, shift scheduling, revenue, membership management and reports are <strong>owner-only</strong> and will be locked in this session.</span>' +
+    '</div>' +
+    credsCard('Operations credentials', [{l:'Email',v:CREDS.ops.user},{l:'Password',v:CREDS.ops.pass}]);
+}
+
+function buildMemberPanel() {
+  return '<div class="role-title">Member portal access</div>' +
+    '<div class="role-card-single" style="border-color:var(--success-bd);margin-bottom:14px">' +
+      '<div class="rc-header"><div class="rc-ico" style="background:var(--success-bg);color:var(--success)"><i class="ti ti-user-circle"></i></div>' +
+      '<div><div class="rc-name">MEMBER</div><div class="rc-role">Personal gym account</div></div></div>' +
+      '<div class="rc-perms">' +
+        perm('ti-check','Home & entry QR',true,'var(--success)') +
+        perm('ti-check','Book classes',true,'var(--success)') +
+        perm('ti-check','Coffee shop',true,'var(--success)') +
+        perm('ti-check','Hair salon',true,'var(--success)') +
+        perm('ti-check','Events & promos',true,'var(--success)') +
+        perm('ti-check','Fitness tracker',true,'var(--success)') +
+        perm('ti-check','My profile',true,'var(--success)') +
+        perm('ti-check','Memberships',true,'var(--success)') +
+      '</div>' +
+    '</div>' +
+    credsCard('Demo member credentials', [{l:'Email',v:CREDS.member.user},{l:'Password',v:CREDS.member.pass}]);
+}
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function showLogin(role) {
+  currentRole = role;
+  var cfg = ROLES[role];
+  document.getElementById('s-select').classList.remove('active');
+  document.getElementById('s-login').classList.add('active');
+
+  // Update form
+  document.getElementById('f-badge').innerHTML = '<div class="'+cfg.badgeClass+'" style="margin-bottom:14px"><i class="ti '+cfg.badgeIcon+'" style="font-size:12px"></i>'+cfg.badgeText+'</div>';
+  document.getElementById('f-heading').textContent = cfg.heading;
+  document.getElementById('f-sub').textContent = cfg.sub;
+  document.getElementById('login-btn').className = cfg.btnClass;
+  document.getElementById('ll-content').innerHTML = cfg.leftPanel();
+  document.getElementById('err-box').classList.remove('show');
+  document.getElementById('f-user').value = '';
+  document.getElementById('f-pass').value = '';
+  document.getElementById('f-user').className = 'fi';
+  document.getElementById('f-pass').className = 'fi';
+  setTimeout(() => document.getElementById('f-user').focus(), 100);
+}
+
+function backToSelect() {
+  document.getElementById('s-login').classList.remove('active');
+  document.getElementById('s-select').classList.add('active');
+  currentRole = null;
+}
+
+// ══════════════════════════════════════════
+// LOGIN LOGIC
+// ══════════════════════════════════════════
+
+function showErr(msg) {
+  document.getElementById('err-text').textContent = msg;
+  document.getElementById('err-box').classList.add('show');
+}
+
+function shakeEl(el) {
+  el.classList.remove('shake');
+  void el.offsetWidth;
+  el.classList.add('shake');
+  setTimeout(() => el.classList.remove('shake'), 400);
+}
+
+// ══════════════════════════════════════════
+// UI HELPERS
+// ══════════════════════════════════════════
+function togglePw() {
+  var fi = document.getElementById('f-pass');
+  var ico = document.getElementById('eye-ico');
+  if (fi.type === 'password') { fi.type = 'text'; ico.className = 'ti ti-eye'; }
+  else { fi.type = 'password'; ico.className = 'ti ti-eye-off'; }
+}
+
+function checkCaps(e) {
+  var warn = document.getElementById('caps-warn');
+  if (warn) warn.style.display = e.getModifierState('CapsLock') ? 'flex' : 'none';
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).catch(function(){});
+  showToast('Copied: ' + text, 'success');
+}
+
+function openForgot() { document.getElementById('modal-forgot').classList.add('open'); setTimeout(()=>document.getElementById('forgot-email').focus(),100); }
+function closeForgot() { document.getElementById('modal-forgot').classList.remove('open'); }
+function sendReset() {
+  var em = document.getElementById('forgot-email').value.trim();
+  if (!em || !em.includes('@')) { showToast('Enter a valid email address.','error'); return; }
+  closeForgot();
+  showToast('Reset link sent to ' + em, 'success');
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  document.getElementById('t-ico').className = 'ti ' + (type==='success'?'ti-check':type==='error'?'ti-x':'ti-info-circle');
+  document.getElementById('t-msg').textContent = msg;
+  t.className = 'toast' + (type?' '+type:'') + ' show';
+  setTimeout(() => t.className = 'toast' + (type?' '+type:''), 3000);
+}
+async function doLogin() {
+  var email = document.getElementById('f-user').value.trim();
+  var pass  = document.getElementById('f-pass').value;
+  var btn   = document.getElementById('login-btn');
+  var btxt  = document.getElementById('btn-text');
+  var errBox = document.getElementById('err-box');
+
+  errBox.classList.remove('show');
+  document.getElementById('f-user').classList.remove('error-field');
+  document.getElementById('f-pass').classList.remove('error-field');
+
+  if (!email) { showErr('Please enter your email.'); shakeEl(document.getElementById('f-user')); document.getElementById('f-user').classList.add('error-field'); return; }
+  if (!pass)  { showErr('Please enter your password.'); shakeEl(document.getElementById('f-pass')); document.getElementById('f-pass').classList.add('error-field'); return; }
+
+  btn.disabled = true;
+  btxt.textContent = 'Signing in…';
+
+  try {
+    var res = await _sb.auth.signInWithPassword({ email: email, password: pass });
+    if (res.error) {
+      btn.disabled = false;
+      btxt.textContent = 'Sign in';
+      if (res.error.message.includes('Invalid login')) {
+        showErr('Incorrect email or password. Please try again.');
+      } else {
+        showErr(res.error.message);
+      }
+      shakeEl(document.getElementById('f-pass'));
+      document.getElementById('f-pass').classList.add('error-field');
+      return;
+    }
+    var meta  = res.data.user.user_metadata || {};
+    var role  = meta.role || 'member';
+    var name  = meta.full_name || email;
+    sessionStorage.setItem('qx_role', role);
+    sessionStorage.setItem('qx_name', name);
+    btxt.textContent = '✓ Welcome back!';
+    showToast('Welcome, ' + name + '!', 'success');
+    setTimeout(function() {
+      if (role === 'owner' || role === 'ops') {
+        window.location.href = 'admin.html?role=' + role;
+      } else {
+        window.location.href = 'member.html';
+      }
+    }, 600);
+  } catch(e) {
+    btn.disabled = false;
+    btxt.textContent = 'Sign in';
+    showErr('Connection error. Please check your internet and try again.');
+  }
+}
+</script>
+</body>
+</html>

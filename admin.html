@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queenix — Management Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root {
+  --blue:#1E90FF;--blue-d:#0D6FD8;--blue-l:#5BB3FF;--blue-pale:rgba(30,144,255,0.10);
+  --ink:#E0E0E0;--ink-mid:#A0A0A0;--ink-light:#606060;
+  --surface:#161616;--surface-2:#0D0D0D;--surface-3:#1C1C1C;
+  --border:rgba(140,117,133,0.15);--border-strong:rgba(140,117,133,0.28);
+  --success:#1B7A3F;--success-bg:#E6F4ED;
+  --warning:#B85C00;--warning-bg:#FEF3E7;
+  --danger:#C0272D;--danger-bg:#FDEBEB;
+  --info:#1565C0;--info-bg:#E3EEFB;
+  --gold:#A0790A;--gold-bg:#FEF8E7;
+  --sidebar-w:230px;--nav-h:56px;
+  --r:10px;--r-sm:6px;--r-pill:99px;
+  --font-d:'Cormorant Garamond',Georgia,serif;
+  --font-b:'Inter',system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-b);background:var(--surface-2);color:var(--ink);font-size:14px;line-height:1.55;}
+
+/* NAV */
+.topnav{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-h);background:#0D0D0D;display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 0;}
+.nav-brand{display:flex;align-items:center;gap:0;width:var(--sidebar-w);padding:0 20px;height:100%;border-right:1px solid rgba(255,255,255,0.08);}
+.brand-q{font-family:var(--font-d);font-size:22px;font-weight:600;color:#fff;letter-spacing:0.04em;}
+.brand-tag{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.12em;text-transform:uppercase;margin-left:8px;padding-left:8px;border-left:1px solid rgba(255,255,255,0.12);}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.live-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--r-pill);background:rgba(27,122,63,0.2);border:1px solid rgba(27,122,63,0.35);font-size:11px;color:#4ADE80;font-weight:500;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#4ADE80;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.nav-time{font-size:12px;color:rgba(255,255,255,0.45);font-weight:400;}
+.staff-chip{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border-radius:var(--r-pill);background:rgba(255,255,255,0.07);cursor:pointer;}
+.staff-chip-av{width:26px;height:26px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;}
+.staff-chip span{font-size:12px;color:rgba(255,255,255,0.7);}
+.nav-icon-btn{color:rgba(255,255,255,0.45);font-size:18px;cursor:pointer;padding:4px;position:relative;}
+.nav-icon-btn .dot{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--blue);border:1px solid var(--ink);}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:var(--nav-h);left:0;bottom:0;width:var(--sidebar-w);background:#0D0D0D;display:flex;flex-direction:column;padding:16px 0;overflow-y:auto;}
+.sb-label{font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.28);padding:12px 16px 5px;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 16px;font-size:13px;color:rgba(255,255,255,0.55);cursor:pointer;border-radius:0;transition:all 0.12s;border-left:2px solid transparent;text-decoration:none;}
+.sb-item i{font-size:16px;flex-shrink:0;}
+.sb-item:hover{color:rgba(255,255,255,0.9);background:rgba(255,255,255,0.05);}
+.sb-item.active{color:#fff;background:rgba(194,24,91,0.18);border-left-color:var(--blue);}
+.sb-badge{margin-left:auto;font-size:10px;padding:1px 6px;border-radius:var(--r-pill);background:var(--blue);color:#fff;font-weight:600;}
+.sb-divider{height:1px;background:rgba(255,255,255,0.07);margin:8px 16px;}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);margin-top:var(--nav-h);min-height:calc(100vh - var(--nav-h));padding:24px;}
+
+/* PAGES */
+.page{display:none;}
+.page.active{display:block;animation:fi 0.18s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:none;}}
+
+.ph{margin-bottom:22px;display:flex;align-items:flex-start;justify-content:space-between;}
+.ph-left .pt{font-family:var(--font-d);font-size:28px;font-weight:500;color:var(--ink);line-height:1.1;}
+.ph-left .ps{font-size:13px;color:var(--ink-light);margin-top:2px;}
+
+/* STAT GRID */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+.sc-label{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-light);margin-bottom:5px;}
+.sc-val{font-family:var(--font-d);font-size:32px;font-weight:500;color:var(--ink);line-height:1;}
+.sc-sub{font-size:11px;color:var(--ink-light);margin-top:3px;}
+.sc-delta{font-size:11px;font-weight:500;}
+.sc-delta.up{color:var(--success);}
+.sc-delta.dn{color:var(--danger);}
+.sc.accent{background:var(--blue-pale);border-color:var(--blue-l);}
+.sc.accent .sc-val{color:var(--blue-d);}
+.sc.success{background:var(--success-bg);border-color:rgba(27,122,63,0.18);}
+.sc.success .sc-val{color:var(--success);}
+.sc.warning{background:var(--warning-bg);border-color:rgba(184,92,0,0.18);}
+.sc.warning .sc-val{color:var(--warning);}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px;}
+.card-title{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-light);margin-bottom:14px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+
+/* OCCUPANCY METER */
+.occ-wrap{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+.occ-ring{position:relative;width:90px;height:90px;flex-shrink:0;}
+.occ-ring svg{transform:rotate(-90deg);}
+.occ-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.occ-ring-num{font-family:var(--font-d);font-size:22px;font-weight:500;color:var(--blue-d);}
+.occ-ring-lbl{font-size:9px;color:var(--ink-light);text-transform:uppercase;letter-spacing:0.08em;}
+.occ-detail{flex:1;}
+.occ-status{font-size:15px;font-weight:500;margin-bottom:3px;}
+.occ-sub{font-size:12px;color:var(--ink-light);}
+.occ-bar-bg{height:5px;background:var(--surface-3);border-radius:var(--r-pill);overflow:hidden;margin-top:10px;}
+.occ-bar{height:100%;border-radius:var(--r-pill);}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-light);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border);}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;color:var(--ink-mid);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:var(--surface-2);}
+.tbl-name{font-weight:500;color:var(--ink);}
+
+/* BADGE */
+.badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--r-pill);}
+.badge.success{background:var(--success-bg);color:var(--success);}
+.badge.warning{background:var(--warning-bg);color:var(--warning);}
+.badge.danger{background:var(--danger-bg);color:var(--danger);}
+.badge.info{background:var(--info-bg);color:var(--info);}
+.badge.neutral{background:var(--surface-3);color:var(--ink-light);}
+.badge.rose{background:var(--blue-pale);color:var(--blue-d);}
+.badge.gold{background:var(--gold-bg);color:var(--gold);}
+
+/* AVATAR */
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+.av.rose{background:var(--blue-pale);color:var(--blue-d);}
+.av.blue{background:var(--info-bg);color:var(--info);}
+.av.green{background:var(--success-bg);color:var(--success);}
+.av.gold{background:var(--gold-bg);color:var(--gold);}
+
+/* ACTIVITY FEED */
+.feed-item{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.feed-item:last-child{border-bottom:none;}
+.feed-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;margin-top:1px;}
+.feed-time{font-size:11px;color:var(--ink-light);white-space:nowrap;margin-top:1px;}
+.feed-text{font-size:13px;color:var(--ink-mid);flex:1;}
+.feed-text strong{color:var(--ink);font-weight:500;}
+
+/* CHART BAR */
+.bar-chart{display:flex;align-items:flex-end;gap:4px;height:80px;margin-top:8px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.bar-fill{width:100%;border-radius:3px 3px 0 0;background:var(--blue-l);transition:height 0.5s ease;}
+.bar-fill.today{background:var(--blue);}
+.bar-lbl{font-size:9px;color:var(--ink-light);}
+
+/* HOURLY HEATMAP */
+.heatmap{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-top:8px;}
+.hm-cell{height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(0,0,0,0);}
+.hm-cell:hover{color:var(--ink);}
+
+/* ORDER CARD */
+.order-card{border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.order-num{font-family:var(--font-d);font-size:20px;font-weight:500;color:var(--blue-d);min-width:40px;}
+.order-detail{flex:1;}
+.order-name{font-size:13px;font-weight:500;color:var(--ink);}
+.order-meta{font-size:11px;color:var(--ink-light);}
+.order-status-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:var(--r-pill);border:none;cursor:pointer;transition:all 0.15s;}
+.order-status-btn.preparing{background:var(--warning-bg);color:var(--warning);}
+.order-status-btn.ready{background:var(--success-bg);color:var(--success);}
+.order-status-btn.done{background:var(--surface-3);color:var(--ink-light);}
+
+/* SHIFT CHIP */
+.shift-chip{display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:6px;background:var(--surface);}
+.shift-time{font-size:11px;color:var(--ink-light);min-width:90px;}
+.shift-name{font-size:13px;font-weight:500;color:var(--ink);}
+.shift-role{font-size:11px;color:var(--ink-light);}
+
+/* MEMBER ROW ACTIONS */
+.action-btn{font-size:11px;padding:4px 10px;border-radius:var(--r-sm);border:1px solid var(--border-strong);background:transparent;color:var(--ink-mid);cursor:pointer;transition:all 0.12s;}
+.action-btn:hover{border-color:var(--blue);color:var(--blue);}
+.action-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
+
+/* TABS */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.tab{padding:8px 16px;font-size:13px;color:var(--ink-light);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.12s;}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:500;}
+.tab:hover:not(.active){color:var(--ink-mid);}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;z-index:300;background:#0D0D0D;color:#fff;padding:10px 18px;border-radius:var(--r);font-size:13px;transform:translateY(60px);opacity:0;transition:all 0.25s;max-width:280px;}
+.toast.show{transform:none;opacity:1;}
+
+/* SEARCH BAR */
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:7px 14px;width:240px;}
+.search-bar i{color:var(--ink-light);font-size:15px;}
+.search-bar input{border:none;outline:none;font-size:13px;color:var(--ink);background:transparent;width:100%;}
+
+/* BTN */
+.btn{padding:8px 16px;border-radius:var(--r-pill);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;}
+.btn-rose{background:var(--blue);color:#fff;}
+.btn-rose:hover{background:var(--blue-d);}
+.btn-outline{background:transparent;border:1px solid var(--border-strong);color:var(--ink-mid);}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue);}
+
+/* PROGRESS */
+.prog-bg{height:5px;background:var(--surface-3);border-radius:var(--r-pill);overflow:hidden;}
+.prog{height:100%;border-radius:var(--r-pill);}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;z-index:200;background:rgba(15,13,16,0.55);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-ov.open{opacity:1;pointer-events:all;}
+.modal-box{background:var(--surface);border-radius:14px;padding:28px;max-width:420px;width:90%;transform:translateY(8px);transition:transform 0.2s;}
+.modal-ov.open .modal-box{transform:none;}
+.modal-title{font-family:var(--font-d);font-size:22px;font-weight:500;margin-bottom:4px;color:var(--ink);}
+.modal-sub{font-size:13px;color:var(--ink-light);margin-bottom:20px;}
+.form-row{margin-bottom:14px;}
+.form-label{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-light);margin-bottom:5px;display:block;}
+.form-input{width:100%;padding:9px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-size:13px;color:var(--ink);outline:none;background:var(--surface);transition:border-color 0.15s;}
+.form-input:focus{border-color:var(--blue);}
+.form-select{width:100%;padding:9px 12px;border:1px solid var(--border-strong);border-radius:var(--r-sm);font-size:13px;color:var(--ink);outline:none;background:var(--surface);}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+</style>
+
+
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const _SUPABASE_URL  = 'https://xnkupxjffbizkoexttdf.supabase.co';
+const _SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhua3VweGpmZmJpemtvZXh0dGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjA0OTgsImV4cCI6MjA5NzI5NjQ5OH0.rn6G9kLyGRGe66fUs_aiYPX9NWT-lNFNIihPA7oe4YQ';
+const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
+
+// ── Session guard: only owner and ops can access ──
+(async function() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { window.location.replace('index.html'); return; }
+  const meta = session.user.user_metadata || {};
+  const role = meta.role || 'member';
+  const name = meta.full_name || session.user.email;
+  if (role === 'member') {
+    window.location.replace('member.html');
+    return;
+  }
+  sessionStorage.setItem('qx_role', role);
+  sessionStorage.setItem('qx_name', name);
+  const fname = name.split(' ')[0];
+  const initials = name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  document.addEventListener('DOMContentLoaded', function() {
+    var av = document.querySelector('.staff-chip-av');
+    if (av) av.textContent = initials || 'ME';
+    var chip = document.querySelector('.staff-chip span');
+    if (chip) chip.textContent = (role === 'owner' ? 'Owner' : 'Manager') + ' · ' + fname;
+  });
+
+  // Override the logout function to use Supabase signOut
+  window._supabaseLogout = async function() {
+    if (confirm('Sign out of Queenix Management?')) {
+      await _sb.auth.signOut();
+      sessionStorage.clear();
+      window.location.replace('index.html');
+    }
+  };
+})();
+</script>
+</head>
+<body>
+
+<!-- TOPNAV -->
+<header class="topnav">
+  <div class="nav-brand">
+    <span class="brand-q">Queenix</span>
+    <span class="brand-tag">Management</span>
+  </div>
+  <div class="nav-right">
+    <div class="live-badge"><div class="live-dot"></div>Live</div>
+    <span class="nav-time" id="nav-clock">—</span>
+    <div class="nav-icon-btn"><i class="ti ti-bell"></i><div class="dot"></div></div>
+    <div class="nav-icon-btn"><i class="ti ti-settings"></i></div>
+    <div class="staff-chip">
+      <div class="staff-chip-av">MA</div>
+      <span>Manager · Aisha</span>
+    </div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-label">Operations</div>
+  <a class="sb-item active" onclick="goTo('dashboard')"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+  <a class="sb-item" onclick="goTo('checkins')"><i class="ti ti-scan"></i>Live check-ins<span class="sb-badge" id="checkin-badge">18</span></a>
+  <a class="sb-item" onclick="goTo('members')"><i class="ti ti-users"></i>Members</a>
+  <a class="sb-item" onclick="goTo('classes')"><i class="ti ti-barbell"></i>Classes</a>
+  <a class="sb-item" onclick="goTo('orders')"><i class="ti ti-coffee"></i>Coffee orders<span class="sb-badge" id="orders-badge">3</span></a>
+  <a class="sb-item" onclick="goTo('salon')"><i class="ti ti-scissors"></i>Salon bookings</a>
+  <div class="sb-divider"></div>
+  <div class="sb-label">People</div>
+  <a class="sb-item" onclick="goTo('staff')"><i class="ti ti-id-badge"></i>Staff management</a>
+  <a class="sb-item" onclick="goTo('shifts')"><i class="ti ti-calendar"></i>Shifts & rota</a>
+  <div class="sb-divider"></div>
+  <div class="sb-label">Business</div>
+  <a class="sb-item" onclick="goTo('revenue')"><i class="ti ti-chart-bar"></i>Revenue</a>
+  <a class="sb-item" onclick="goTo('memberships')"><i class="ti ti-crown"></i>Memberships</a>
+  <a class="sb-item" onclick="goTo('reports')"><i class="ti ti-report-analytics"></i>Reports</a>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- ══ DASHBOARD ══ -->
+<div class="page active" id="page-dashboard">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="pt">Good morning, Aisha</div>
+      <div class="ps">Monday, 16 June 2026 · Here's what's happening at Queenix today</div>
+    </div>
+    <button class="btn btn-rose" onclick="showToast('Daily report generated and sent to your email.')"><i class="ti ti-download" style="font-size:13px;vertical-align:-1px"></i> Export report</button>
+  </div>
+
+  <div class="sg">
+    <div class="sc accent">
+      <div class="sc-label">Members in gym</div>
+      <div class="sc-val" id="dash-count">18</div>
+      <div class="sc-sub">of 120 capacity <span class="sc-delta up">Quiet</span></div>
+    </div>
+    <div class="sc">
+      <div class="sc-label">Check-ins today</div>
+      <div class="sc-val">34</div>
+      <div class="sc-sub"><span class="sc-delta up">↑ 12%</span> vs last Monday</div>
+    </div>
+    <div class="sc success">
+      <div class="sc-label">Revenue today</div>
+      <div class="sc-val" style="font-size:24px;">AED 4,820</div>
+      <div class="sc-sub"><span class="sc-delta up">↑ 8%</span> vs yesterday</div>
+    </div>
+    <div class="sc">
+      <div class="sc-label">Active memberships</div>
+      <div class="sc-val">284</div>
+      <div class="sc-sub"><span class="sc-delta up">+3</span> this week</div>
+    </div>
+    <div class="sc warning">
+      <div class="sc-label">Expiring this week</div>
+      <div class="sc-val">12</div>
+      <div class="sc-sub">Renewal reminders sent</div>
+    </div>
+    <div class="sc">
+      <div class="sc-label">Pending orders</div>
+      <div class="sc-val">3</div>
+      <div class="sc-sub">Coffee shop · <a onclick="goTo('orders')" style="color:var(--blue);cursor:pointer;">View</a></div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:16px;">
+    <!-- OCCUPANCY -->
+    <div class="card">
+      <div class="card-title">Live occupancy</div>
+      <div class="occ-wrap">
+        <div class="occ-ring">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle cx="45" cy="45" r="36" fill="none" stroke="#EFE8EC" stroke-width="7"/>
+            <circle cx="45" cy="45" r="36" fill="none" stroke="#1B7A3F" stroke-width="7" stroke-dasharray="226.2" stroke-dashoffset="193" stroke-linecap="round"/>
+          </svg>
+          <div class="occ-ring-text">
+            <div class="occ-ring-num" style="color:var(--success)">15%</div>
+            <div class="occ-ring-lbl">capacity</div>
+          </div>
+        </div>
+        <div class="occ-detail">
+          <div class="occ-status" style="color:var(--success);">Quiet</div>
+          <div class="occ-sub">18 members present</div>
+          <div class="occ-sub" style="margin-top:2px;">Max capacity: 120</div>
+          <div class="occ-bar-bg" style="margin-top:8px;"><div class="occ-bar" style="width:15%;background:var(--success);"></div></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center;">
+        <div style="background:var(--success-bg);border-radius:var(--r-sm);padding:8px;">
+          <div style="font-size:10px;color:var(--success);font-weight:600;">Quiet</div>
+          <div style="font-size:9px;color:var(--ink-light);">0–40</div>
+        </div>
+        <div style="background:var(--warning-bg);border-radius:var(--r-sm);padding:8px;">
+          <div style="font-size:10px;color:var(--warning);font-weight:600;">Moderate</div>
+          <div style="font-size:9px;color:var(--ink-light);">41–80</div>
+        </div>
+        <div style="background:var(--danger-bg);border-radius:var(--r-sm);padding:8px;">
+          <div style="font-size:10px;color:var(--danger);font-weight:600;">Busy</div>
+          <div style="font-size:9px;color:var(--ink-light);">81–120</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TODAY'S CLASSES -->
+    <div class="card">
+      <div class="card-title">Today's classes</div>
+      <table class="tbl" style="font-size:12px;">
+        <thead><tr><th>Time</th><th>Class</th><th>Booked</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>7:00</td><td class="tbl-name">Yoga</td><td>12/15</td><td><span class="badge success">Live</span></td></tr>
+          <tr><td>9:00</td><td class="tbl-name">Boxing</td><td>12/12</td><td><span class="badge warning">Full</span></td></tr>
+          <tr><td>11:00</td><td class="tbl-name">Pilates</td><td>9/15</td><td><span class="badge info">Upcoming</span></td></tr>
+          <tr><td>13:00</td><td class="tbl-name">Spin</td><td>15/15</td><td><span class="badge warning">Full</span></td></tr>
+          <tr><td>15:30</td><td class="tbl-name">HIIT</td><td>5/15</td><td><span class="badge info">Open</span></td></tr>
+          <tr><td>17:30</td><td class="tbl-name">Zumba</td><td>3/15</td><td><span class="badge info">Open</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- LIVE ACTIVITY FEED -->
+    <div class="card">
+      <div class="card-title">Live activity feed</div>
+      <div id="activity-feed">
+        <div class="feed-item"><div class="feed-icon" style="background:var(--success-bg);color:var(--success)"><i class="ti ti-door-enter" style="font-size:13px"></i></div><div class="feed-text"><strong>Lana A.</strong> checked in</div><div class="feed-time">09:42</div></div>
+        <div class="feed-item"><div class="feed-icon" style="background:var(--gold-bg);color:var(--gold)"><i class="ti ti-coffee" style="font-size:13px"></i></div><div class="feed-text"><strong>Order #031</strong> — Flat white placed</div><div class="feed-time">09:40</div></div>
+        <div class="feed-item"><div class="feed-icon" style="background:var(--blue-pale);color:var(--blue)"><i class="ti ti-barbell" style="font-size:13px"></i></div><div class="feed-text"><strong>Sara M.</strong> booked Boxing 9 AM</div><div class="feed-time">09:37</div></div>
+        <div class="feed-item"><div class="feed-icon" style="background:var(--success-bg);color:var(--success)"><i class="ti ti-door-enter" style="font-size:13px"></i></div><div class="feed-text"><strong>Nadia K.</strong> checked in</div><div class="feed-time">09:35</div></div>
+        <div class="feed-item"><div class="feed-icon" style="background:#EDE7F6;color:#512DA8"><i class="ti ti-scissors" style="font-size:13px"></i></div><div class="feed-text"><strong>Reem J.</strong> booked Blow-dry 2 PM</div><div class="feed-time">09:30</div></div>
+        <div class="feed-item"><div class="feed-icon" style="background:var(--danger-bg);color:var(--danger)"><i class="ti ti-door-exit" style="font-size:13px"></i></div><div class="feed-text"><strong>Hessa T.</strong> checked out</div><div class="feed-time">09:28</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOURLY TRAFFIC -->
+  <div class="card" style="margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin-bottom:0;">Hourly foot traffic today</div>
+      <span style="font-size:11px;color:var(--ink-light);">Peak: 6–8 PM · 94 members</span>
+    </div>
+    <div class="bar-chart" style="height:100px;">
+      <div class="bar-col"><div class="bar-fill" style="height:20%"></div><div class="bar-lbl">6am</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:55%"></div><div class="bar-lbl">7am</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:70%"></div><div class="bar-lbl">8am</div></div>
+      <div class="bar-col"><div class="bar-fill today" style="height:15%"></div><div class="bar-lbl">9am</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:30%"></div><div class="bar-lbl">10am</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:25%"></div><div class="bar-lbl">11am</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:20%"></div><div class="bar-lbl">12pm</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:35%"></div><div class="bar-lbl">1pm</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:40%"></div><div class="bar-lbl">2pm</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:55%"></div><div class="bar-lbl">3pm</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:75%"></div><div class="bar-lbl">4pm</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:90%"></div><div class="bar-lbl">5pm</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:100%"></div><div class="bar-lbl">6pm</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:95%"></div><div class="bar-lbl">7pm</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:60%"></div><div class="bar-lbl">8pm</div></div>
+      <div class="bar-col"><div class="bar-fill" style="height:20%"></div><div class="bar-lbl">9pm</div></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- REVENUE SPLIT -->
+    <div class="card">
+      <div class="card-title">Revenue breakdown — today</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>Memberships</span><span style="font-weight:500;">AED 3,150</span></div><div class="prog-bg"><div class="prog" style="width:65%;background:var(--blue);"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>Classes (drop-in)</span><span style="font-weight:500;">AED 820</span></div><div class="prog-bg"><div class="prog" style="width:17%;background:#7C4DFF;"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>Coffee shop</span><span style="font-weight:500;">AED 540</span></div><div class="prog-bg"><div class="prog" style="width:11%;background:var(--gold);"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>Hair salon</span><span style="font-weight:500;">AED 310</span></div><div class="prog-bg"><div class="prog" style="width:7%;background:#00897B;"></div></div></div>
+      </div>
+    </div>
+    <!-- STAFF ON SHIFT -->
+    <div class="card">
+      <div class="card-title">Staff on duty now</div>
+      <div class="shift-chip"><span class="badge success">On shift</span><div style="margin-left:4px;"><div class="shift-name">Layla Hassan</div><div class="shift-role">Boxing coach · 6:00 AM – 2:00 PM</div></div></div>
+      <div class="shift-chip"><span class="badge success">On shift</span><div style="margin-left:4px;"><div class="shift-name">Nour Saleh</div><div class="shift-role">Pilates instructor · 8:00 AM – 4:00 PM</div></div></div>
+      <div class="shift-chip"><span class="badge success">On shift</span><div style="margin-left:4px;"><div class="shift-name">Sara K.</div><div class="shift-role">Stylist · Salon · 9:00 AM – 5:00 PM</div></div></div>
+      <div class="shift-chip"><span class="badge warning">Late</span><div style="margin-left:4px;"><div class="shift-name">Dina Rashid</div><div class="shift-role">Reception · Due 9:00 AM</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LIVE CHECK-INS ══ -->
+<div class="page" id="page-checkins">
+  <div class="ph">
+    <div class="ph-left"><div class="pt">Live check-ins</div><div class="ps">Real-time gate activity — <strong id="ci-count" style="color:var(--blue)">18 members</strong> currently in the gym</div></div>
+    <div style="display:flex;gap:8px;">
+      <div class="search-bar"><i class="ti ti-search"></i><input placeholder="Search member…" oninput="filterTable(this.value,'ci-table')"></div>
+    </div>
+  </div>
+  <div class="sg">
+    <div class="sc accent"><div class="sc-label">In gym now</div><div class="sc-val">18</div><div class="sc-sub">of 120 capacity</div></div>
+    <div class="sc"><div class="sc-label">Checked in today</div><div class="sc-val">34</div></div>
+    <div class="sc success"><div class="sc-label">Checked out</div><div class="sc-val">16</div></div>
+    <div class="sc warning"><div class="sc-label">Avg visit length</div><div class="sc-val" style="font-size:22px;">72 min</div></div>
+  </div>
+  <div class="card">
+    <table class="tbl" id="ci-table">
+      <thead><tr><th>Member</th><th>Tier</th><th>Check-in time</th><th>Duration</th><th>Status</th><th>Membership expires</th></tr></thead>
+      <tbody>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av rose">SA</div><span class="tbl-name">Sara Al-Mansoori</span></div></td><td><span class="badge rose">Premium</span></td><td>08:14 AM</td><td>88 min</td><td><span class="badge success">In gym</span></td><td>15 Jul 2026</td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av blue">LK</div><span class="tbl-name">Lana Khoury</span></div></td><td><span class="badge gold">VIP</span></td><td>08:40 AM</td><td>62 min</td><td><span class="badge success">In gym</span></td><td>30 Jun 2026</td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av green">NJ</div><span class="tbl-name">Nadia Jabri</span></div></td><td><span class="badge neutral">Basic</span></td><td>09:01 AM</td><td>41 min</td><td><span class="badge success">In gym</span></td><td>20 Jun 2026</td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av rose">RH</div><span class="tbl-name">Reem Hassan</span></div></td><td><span class="badge rose">Premium</span></td><td>09:22 AM</td><td>20 min</td><td><span class="badge success">In gym</span></td><td>1 Aug 2026</td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av gold">HT</div><span class="tbl-name">Hessa Tamimi</span></div></td><td><span class="badge rose">Premium</span></td><td>07:50 AM</td><td>—</td><td><span class="badge neutral">Checked out</span></td><td>10 Jul 2026</td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av blue">MA</div><span class="tbl-name">Moza Al-Ali</span></div></td><td><span class="badge gold">VIP</span></td><td>07:30 AM</td><td>—</td><td><span class="badge neutral">Checked out</span></td><td>31 Dec 2026</td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av rose">DM</div><span class="tbl-name">Dana Mahmoud</span></div></td><td><span class="badge neutral">Basic</span></td><td>08:55 AM</td><td>47 min</td><td><span class="badge warning">Exp. soon</span></td><td>18 Jun 2026</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ MEMBERS ══ -->
+<div class="page" id="page-members">
+  <div class="ph">
+    <div class="ph-left"><div class="pt">Members</div><div class="ps">284 active members · Ladies only</div></div>
+    <div style="display:flex;gap:8px;">
+      <div class="search-bar"><i class="ti ti-search"></i><input placeholder="Search by name or email…" oninput="filterTable(this.value,'members-table')"></div>
+      <button class="btn btn-rose" onclick="openModal('modal-add-member')"><i class="ti ti-plus" style="font-size:13px;vertical-align:-1px"></i> Add member</button>
+    </div>
+  </div>
+  <div class="sg">
+    <div class="sc accent"><div class="sc-label">Total active</div><div class="sc-val">284</div></div>
+    <div class="sc"><div class="sc-label">Basic</div><div class="sc-val">89</div></div>
+    <div class="sc"><div class="sc-label">Premium</div><div class="sc-val">142</div></div>
+    <div class="sc gold"><div class="sc-label">VIP</div><div class="sc-val">53</div></div>
+    <div class="sc warning"><div class="sc-label">Expiring ≤7 days</div><div class="sc-val">12</div></div>
+    <div class="sc danger" style="background:var(--danger-bg);border-color:rgba(192,39,45,0.15)"><div class="sc-label">Frozen</div><div class="sc-val" style="color:var(--danger)">7</div></div>
+  </div>
+  <div class="card">
+    <table class="tbl" id="members-table">
+      <thead><tr><th>Name</th><th>Membership</th><th>Joined</th><th>Expires</th><th>Visits</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av rose">SA</div><div><div class="tbl-name">Sara Al-Mansoori</div><div style="font-size:11px;color:var(--ink-light)">sara@email.com</div></div></div></td><td><span class="badge rose">Premium</span></td><td>Jan 2024</td><td>15 Jul 2026</td><td>47</td><td><span class="badge success">Active</span></td><td><button class="action-btn" onclick="showToast('Opening Sara\'s profile...')">View</button> <button class="action-btn" onclick="showToast('Edit member panel open.')">Edit</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av gold">LK</div><div><div class="tbl-name">Lana Khoury</div><div style="font-size:11px;color:var(--ink-light)">lana@email.com</div></div></div></td><td><span class="badge gold">VIP</span></td><td>Mar 2023</td><td>30 Jun 2026</td><td>112</td><td><span class="badge warning">Exp. soon</span></td><td><button class="action-btn" onclick="showToast('Opening Lana\'s profile...')">View</button> <button class="action-btn" onclick="showToast('Renewal reminder sent to Lana.')">Remind</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av blue">NJ</div><div><div class="tbl-name">Nadia Jabri</div><div style="font-size:11px;color:var(--ink-light)">nadia@email.com</div></div></div></td><td><span class="badge neutral">Basic</span></td><td>Jun 2024</td><td>20 Jun 2026</td><td>23</td><td><span class="badge warning">Exp. soon</span></td><td><button class="action-btn" onclick="showToast('Opening Nadia\'s profile...')">View</button> <button class="action-btn" onclick="showToast('Renewal reminder sent to Nadia.')">Remind</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av rose">RH</div><div><div class="tbl-name">Reem Hassan</div><div style="font-size:11px;color:var(--ink-light)">reem@email.com</div></div></div></td><td><span class="badge rose">Premium</span></td><td>Sep 2024</td><td>1 Aug 2026</td><td>31</td><td><span class="badge success">Active</span></td><td><button class="action-btn" onclick="showToast('Opening Reem\'s profile...')">View</button> <button class="action-btn" onclick="showToast('Edit member panel open.')">Edit</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av green">HT</div><div><div class="tbl-name">Hessa Tamimi</div><div style="font-size:11px;color:var(--ink-light)">hessa@email.com</div></div></div></td><td><span class="badge rose">Premium</span></td><td>Feb 2025</td><td>10 Jul 2026</td><td>19</td><td><span class="badge success">Active</span></td><td><button class="action-btn" onclick="showToast('Opening Hessa\'s profile...')">View</button> <button class="action-btn" onclick="showToast('Edit member panel open.')">Edit</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av gold">MA</div><div><div class="tbl-name">Moza Al-Ali</div><div style="font-size:11px;color:var(--ink-light)">moza@email.com</div></div></div></td><td><span class="badge gold">VIP</span></td><td>Nov 2022</td><td>31 Dec 2026</td><td>204</td><td><span class="badge success">Active</span></td><td><button class="action-btn" onclick="showToast('Opening Moza\'s profile...')">View</button> <button class="action-btn" onclick="showToast('Edit member panel open.')">Edit</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av blue">DM</div><div><div class="tbl-name">Dana Mahmoud</div><div style="font-size:11px;color:var(--ink-light)">dana@email.com</div></div></div></td><td><span class="badge neutral">Basic</span></td><td>May 2026</td><td>18 Jun 2026</td><td>8</td><td><span class="badge danger">Exp. 2 days</span></td><td><button class="action-btn" onclick="showToast('Opening Dana\'s profile...')">View</button> <button class="action-btn" onclick="showToast('Reminder sent to Dana.')">Remind</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av rose">FM</div><div><div class="tbl-name">Fatima Malik</div><div style="font-size:11px;color:var(--ink-light)">fatima@email.com</div></div></div></td><td><span class="badge rose">Premium</span></td><td>Apr 2024</td><td>—</td><td>38</td><td><span class="badge neutral">Frozen</span></td><td><button class="action-btn" onclick="showToast('Opening Fatima\'s profile...')">View</button> <button class="action-btn" onclick="showToast('Membership unfrozen for Fatima.')">Unfreeze</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ CLASSES ══ -->
+<div class="page" id="page-classes">
+  <div class="ph">
+    <div class="ph-left"><div class="pt">Classes</div><div class="ps">Schedule management and capacity tracking</div></div>
+    <button class="btn btn-rose" onclick="openModal('modal-add-class')"><i class="ti ti-plus" style="font-size:13px;vertical-align:-1px"></i> Add class</button>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="selTab(this)">Mon 16</div>
+    <div class="tab" onclick="selTab(this)">Tue 17</div>
+    <div class="tab" onclick="selTab(this)">Wed 18</div>
+    <div class="tab" onclick="selTab(this)">Thu 19</div>
+    <div class="tab" onclick="selTab(this)">Fri 20</div>
+    <div class="tab" onclick="selTab(this)">Sat 21</div>
+  </div>
+  <div class="card">
+    <table class="tbl">
+      <thead><tr><th>Time</th><th>Class</th><th>Instructor</th><th>Studio</th><th>Booked / Cap</th><th>Waitlist</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td>07:00</td><td class="tbl-name">Yoga & mindfulness</td><td>Hana Yousif</td><td>Studio A</td><td><div class="prog-bg" style="width:80px;display:inline-block;vertical-align:middle;margin-right:6px;"><div class="prog" style="width:80%;background:var(--success);"></div></div>12/15</td><td>0</td><td><span class="badge success">Live now</span></td><td><button class="action-btn" onclick="showToast('Class details open.')">Manage</button></td></tr>
+        <tr><td>09:00</td><td class="tbl-name">Boxing fundamentals</td><td>Coach Layla</td><td>Boxing ring</td><td><div class="prog-bg" style="width:80px;display:inline-block;vertical-align:middle;margin-right:6px;"><div class="prog" style="width:100%;background:var(--danger);"></div></div>12/12</td><td>3</td><td><span class="badge warning">Full</span></td><td><button class="action-btn" onclick="showToast('Class details open.')">Manage</button></td></tr>
+        <tr><td>11:00</td><td class="tbl-name">Pilates core flow</td><td>Instructor Nour</td><td>Studio B</td><td><div class="prog-bg" style="width:80px;display:inline-block;vertical-align:middle;margin-right:6px;"><div class="prog" style="width:60%;background:var(--blue);"></div></div>9/15</td><td>0</td><td><span class="badge info">Upcoming</span></td><td><button class="action-btn" onclick="showToast('Class details open.')">Manage</button></td></tr>
+        <tr><td>13:00</td><td class="tbl-name">Spin class</td><td>Coach Rima</td><td>Cycle studio</td><td><div class="prog-bg" style="width:80px;display:inline-block;vertical-align:middle;margin-right:6px;"><div class="prog" style="width:100%;background:var(--danger);"></div></div>15/15</td><td>5</td><td><span class="badge warning">Full</span></td><td><button class="action-btn" onclick="showToast('Class details open.')">Manage</button></td></tr>
+        <tr><td>15:30</td><td class="tbl-name">HIIT challenge</td><td>Coach Sara</td><td>Main floor</td><td><div class="prog-bg" style="width:80px;display:inline-block;vertical-align:middle;margin-right:6px;"><div class="prog" style="width:33%;background:var(--success);"></div></div>5/15</td><td>0</td><td><span class="badge info">Open</span></td><td><button class="action-btn" onclick="showToast('Class details open.')">Manage</button></td></tr>
+        <tr><td>17:30</td><td class="tbl-name">Zumba</td><td>Instructor Dana</td><td>Studio A</td><td><div class="prog-bg" style="width:80px;display:inline-block;vertical-align:middle;margin-right:6px;"><div class="prog" style="width:20%;background:var(--success);"></div></div>3/15</td><td>0</td><td><span class="badge info">Open</span></td><td><button class="action-btn" onclick="showToast('Class details open.')">Manage</button></td></tr>
+        <tr><td>19:00</td><td class="tbl-name">Stretch & recovery</td><td>Hana Yousif</td><td>Studio B</td><td><div class="prog-bg" style="width:80px;display:inline-block;vertical-align:middle;margin-right:6px;"><div class="prog" style="width:0%;background:var(--success);"></div></div>0/15</td><td>0</td><td><span class="badge neutral">Not open</span></td><td><button class="action-btn" onclick="showToast('Class details open.')">Manage</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ COFFEE ORDERS ══ -->
+<div class="page" id="page-orders">
+  <div class="ph">
+    <div class="ph-left"><div class="pt">Coffee shop orders</div><div class="ps">Live queue — update status as you prepare each order</div></div>
+  </div>
+  <div class="sg">
+    <div class="sc warning"><div class="sc-label">Pending</div><div class="sc-val">3</div></div>
+    <div class="sc accent"><div class="sc-label">Preparing</div><div class="sc-val">2</div></div>
+    <div class="sc success"><div class="sc-label">Ready</div><div class="sc-val">1</div></div>
+    <div class="sc"><div class="sc-label">Completed today</div><div class="sc-val">28</div></div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="card-title">Live queue</div>
+      <div id="order-queue">
+        <div class="order-card"><div class="order-num">#032</div><div class="order-detail"><div class="order-name">Lana Khoury — 1 × Matcha latte</div><div class="order-meta">Placed 09:41 · Oat milk · iced</div></div><button class="order-status-btn preparing" onclick="cycleOrder(this)">Preparing</button></div>
+        <div class="order-card"><div class="order-num">#031</div><div class="order-detail"><div class="order-name">Sara Al-Mansoori — Flat white + Acai bowl</div><div class="order-meta">Placed 09:40 · Oat milk</div></div><button class="order-status-btn preparing" onclick="cycleOrder(this)">Preparing</button></div>
+        <div class="order-card"><div class="order-num">#030</div><div class="order-detail"><div class="order-name">Reem Hassan — 1 × Protein shake</div><div class="order-meta">Placed 09:35 · Chocolate</div></div><button class="order-status-btn ready" onclick="cycleOrder(this)">Ready</button></div>
+        <div class="order-card"><div class="order-num">#029</div><div class="order-detail"><div class="order-name">Nadia Jabri — 1 × Cappuccino</div><div class="order-meta">Placed 09:28 · Collected 09:38</div></div><button class="order-status-btn done" onclick="cycleOrder(this)">Collected</button></div>
+        <div class="order-card"><div class="order-num">#028</div><div class="order-detail"><div class="order-name">Hessa Tamimi — Green smoothie</div><div class="order-meta">Placed 09:12 · Collected 09:22</div></div><button class="order-status-btn done" onclick="cycleOrder(this)">Collected</button></div>
+      </div>
+    </div>
+    <div>
+      <div class="card-title">Today's sales</div>
+      <div class="card">
+        <table class="tbl">
+          <thead><tr><th>Item</th><th>Qty sold</th><th>Revenue</th></tr></thead>
+          <tbody>
+            <tr><td class="tbl-name">Flat white</td><td>12</td><td>AED 216</td></tr>
+            <tr><td class="tbl-name">Matcha latte</td><td>8</td><td>AED 176</td></tr>
+            <tr><td class="tbl-name">Protein shake</td><td>7</td><td>AED 175</td></tr>
+            <tr><td class="tbl-name">Acai bowl</td><td>4</td><td>AED 140</td></tr>
+            <tr><td class="tbl-name">Green smoothie</td><td>5</td><td>AED 140</td></tr>
+            <tr><td class="tbl-name">Cappuccino</td><td>6</td><td>AED 96</td></tr>
+            <tr style="font-weight:600;"><td>Total</td><td>42 orders</td><td>AED 943</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SALON BOOKINGS ══ -->
+<div class="page" id="page-salon">
+  <div class="ph">
+    <div class="ph-left"><div class="pt">Salon bookings</div><div class="ps">Queenix Hair Salon — appointment management</div></div>
+    <button class="btn btn-rose" onclick="openModal('modal-add-appt')"><i class="ti ti-plus" style="font-size:13px;vertical-align:-1px"></i> Add appointment</button>
+  </div>
+  <div class="sg">
+    <div class="sc accent"><div class="sc-label">Today's appointments</div><div class="sc-val">9</div></div>
+    <div class="sc success"><div class="sc-label">Completed</div><div class="sc-val">3</div></div>
+    <div class="sc"><div class="sc-label">Upcoming</div><div class="sc-val">6</div></div>
+    <div class="sc warning"><div class="sc-label">Today's revenue</div><div class="sc-val" style="font-size:22px;">AED 840</div></div>
+  </div>
+  <div class="card">
+    <table class="tbl">
+      <thead><tr><th>Time</th><th>Client</th><th>Service</th><th>Stylist</th><th>Duration</th><th>Price</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td>10:00</td><td class="tbl-name">Hessa Tamimi</td><td>Blow-dry</td><td>Sara K.</td><td>45 min</td><td>AED 80</td><td><span class="badge success">Done</span></td><td><button class="action-btn" onclick="showToast('Receipt sent to Hessa.')">Receipt</button></td></tr>
+        <tr><td>11:00</td><td class="tbl-name">Moza Al-Ali</td><td>Cut & style</td><td>Lina M.</td><td>60 min</td><td>AED 150</td><td><span class="badge success">Done</span></td><td><button class="action-btn" onclick="showToast('Receipt sent to Moza.')">Receipt</button></td></tr>
+        <tr><td>12:00</td><td class="tbl-name">Reem Hassan</td><td>Hair treatment</td><td>Rania H.</td><td>45 min</td><td>AED 120</td><td><span class="badge success">Done</span></td><td><button class="action-btn" onclick="showToast('Receipt sent to Reem.')">Receipt</button></td></tr>
+        <tr><td>13:00</td><td class="tbl-name">Nadia Jabri</td><td>Colour</td><td>Lina M.</td><td>120 min</td><td>AED 280</td><td><span class="badge info">In progress</span></td><td><button class="action-btn" onclick="showToast('Marked as complete.')">Complete</button></td></tr>
+        <tr><td>14:00</td><td class="tbl-name">Reim J.</td><td>Blow-dry</td><td>Sara K.</td><td>45 min</td><td>AED 80</td><td><span class="badge neutral">Upcoming</span></td><td><button class="action-btn" onclick="showToast('Reminder sent.')">Remind</button></td></tr>
+        <tr><td>15:00</td><td class="tbl-name">Sara Al-Mansoori</td><td>Blow-dry</td><td>Sara K.</td><td>45 min</td><td>AED 80</td><td><span class="badge neutral">Upcoming</span></td><td><button class="action-btn" onclick="showToast('Reminder sent.')">Remind</button></td></tr>
+        <tr><td>16:00</td><td class="tbl-name">Lana Khoury</td><td>Cut & style</td><td>Rania H.</td><td>60 min</td><td>AED 150</td><td><span class="badge neutral">Upcoming</span></td><td><button class="action-btn" onclick="showToast('Reminder sent.')">Remind</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ STAFF MANAGEMENT ══ -->
+<div class="page" id="page-staff">
+  <div class="ph">
+    <div class="ph-left"><div class="pt">Staff management</div><div class="ps">14 team members across all roles</div></div>
+    <button class="btn btn-rose" onclick="openModal('modal-add-staff')"><i class="ti ti-plus" style="font-size:13px;vertical-align:-1px"></i> Add staff member</button>
+  </div>
+  <div class="sg">
+    <div class="sc"><div class="sc-label">Total staff</div><div class="sc-val">14</div></div>
+    <div class="sc success"><div class="sc-label">On shift today</div><div class="sc-val">8</div></div>
+    <div class="sc warning"><div class="sc-label">Late today</div><div class="sc-val">1</div></div>
+    <div class="sc accent"><div class="sc-label">Instructors</div><div class="sc-val">6</div></div>
+  </div>
+  <div class="card">
+    <table class="tbl">
+      <thead><tr><th>Name</th><th>Role</th><th>Department</th><th>Shift today</th><th>Status</th><th>Certifications</th><th>Actions</th></tr></thead>
+      <tbody>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av rose">LH</div><span class="tbl-name">Layla Hassan</span></div></td><td>Boxing coach</td><td>Classes</td><td>06:00 – 14:00</td><td><span class="badge success">On shift</span></td><td>Level 3 PT, Boxing</td><td><button class="action-btn" onclick="showToast('Staff profile open.')">Profile</button> <button class="action-btn" onclick="showToast('Edit panel open.')">Edit</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av blue">NS</div><span class="tbl-name">Nour Saleh</span></div></td><td>Pilates instructor</td><td>Classes</td><td>08:00 – 16:00</td><td><span class="badge success">On shift</span></td><td>Pilates Level 2</td><td><button class="action-btn" onclick="showToast('Staff profile open.')">Profile</button> <button class="action-btn" onclick="showToast('Edit panel open.')">Edit</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av green">HY</div><span class="tbl-name">Hana Yousif</span></div></td><td>Yoga instructor</td><td>Classes</td><td>06:00 – 14:00</td><td><span class="badge success">On shift</span></td><td>RYT-200, Mindfulness</td><td><button class="action-btn" onclick="showToast('Staff profile open.')">Profile</button> <button class="action-btn" onclick="showToast('Edit panel open.')">Edit</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av gold">SK</div><span class="tbl-name">Sara K.</span></div></td><td>Senior stylist</td><td>Salon</td><td>09:00 – 17:00</td><td><span class="badge success">On shift</span></td><td>NVQ Level 3 Hair</td><td><button class="action-btn" onclick="showToast('Staff profile open.')">Profile</button> <button class="action-btn" onclick="showToast('Edit panel open.')">Edit</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av rose">DR</div><span class="tbl-name">Dina Rashid</span></div></td><td>Receptionist</td><td>Front desk</td><td>09:00 – 17:00</td><td><span class="badge warning">Late</span></td><td>—</td><td><button class="action-btn" onclick="showToast('Staff profile open.')">Profile</button> <button class="action-btn danger" onclick="showToast('Absence logged for Dina.')">Log absence</button></td></tr>
+        <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="av blue">LM</div><span class="tbl-name">Lina M.</span></div></td><td>Colourist</td><td>Salon</td><td>09:00 – 18:00</td><td><span class="badge success">On shift</span></td><td>Colour specialist</td><td><button class="action-btn" onclick="showToast('Staff profile open.')">Profile</button> <button class="action-btn" onclick="showToast('Edit panel open.')">Edit</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ SHIFTS & ROTA ══ -->
+<div class="page" id="page-shifts">
+  <div class="ph">
+    <div class="ph-left"><div class="pt">Shifts & rota</div><div class="ps">Week of 16 – 22 June 2026</div></div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-outline" onclick="showToast('Previous week loaded.')">← Prev week</button>
+      <button class="btn btn-outline" onclick="showToast('Next week loaded.')">Next week →</button>
+      <button class="btn btn-rose" onclick="openModal('modal-add-shift')">Add shift</button>
+    </div>
+  </div>
+  <div class="card" style="overflow-x:auto;">
+    <table class="tbl" style="min-width:700px;">
+      <thead>
+        <tr>
+          <th style="min-width:140px;">Staff</th>
+          <th>Mon 16</th><th>Tue 17</th><th>Wed 18</th><th>Thu 19</th><th>Fri 20</th><th>Sat 21</th><th>Sun 22</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="tbl-name">Layla Hassan</td><td><span class="badge success">06:00–14:00</span></td><td><span class="badge success">06:00–14:00</span></td><td><span class="badge neutral">Off</span></td><td><span class="badge success">06:00–14:00</span></td><td><span class="badge success">06:00–14:00</span></td><td><span class="badge warning">08:00–13:00</span></td><td><span class="badge neutral">Off</span></td></tr>
+        <tr><td class="tbl-name">Nour Saleh</td><td><span class="badge success">08:00–16:00</span></td><td><span class="badge neutral">Off</span></td><td><span class="badge success">08:00–16:00</span></td><td><span class="badge success">08:00–16:00</span></td><td><span class="badge neutral">Off</span></td><td><span class="badge success">09:00–17:00</span></td><td><span class="badge neutral">Off</span></td></tr>
+        <tr><td class="tbl-name">Hana Yousif</td><td><span class="badge success">06:00–14:00</span></td><td><span class="badge success">06:00–14:00</span></td><td><span class="badge success">06:00–14:00</span></td><td><span class="badge neutral">Off</span></td><td><span class="badge success">06:00–14:00</span></td><td><span class="badge warning">08:00–12:00</span></td><td><span class="badge neutral">Off</span></td></tr>
+        <tr><td class="tbl-name">Sara K.</td><td><span class="badge success">09:00–17:00</span></td><td><span class="badge success">09:00–17:00</span></td><td><span class="badge success">09:00–17:00</span></td><td><span class="badge success">09:00–17:00</span></td><td><span class="badge neutral">Off</span></td><td><span class="badge success">10:00–18:00</span></td><td><span class="badge neutral">Off</span></td></tr>
+        <tr><td class="tbl-name">Dina Rashid</td><td><span class="badge warning">Late today</span></td><td><span class="badge success">09:00–17:00</span></td><td><span class="badge success">09:00–17:00</span></td><td><span class="badge neutral">Off</span></td><td><span class="badge success">09:00–17:00</span></td><td><span class="badge neutral">Off</span></td><td><span class="badge neutral">Off</span></td></tr>
+        <tr><td class="tbl-name">Lina M.</td><td><span class="badge success">09:00–18:00</span></td><td><span class="badge success">09:00–18:00</span></td><td><span class="badge neutral">Off</span></td><td><span class="badge success">09:00–18:00</span></td><td><span class="badge success">09:00–18:00</span></td><td><span class="badge success">10:00–18:00</span></td><td><span class="badge neutral">Off</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ REVENUE ══ -->
+<div class="page" id="page-revenue">
+  <div class="ph">
+    <div class="ph-left"><div class="pt">Revenue</div><div class="ps">June 2026 · AED 68,400 month-to-date</div></div>
+    <button class="btn btn-rose" onclick="showToast('Revenue report exported.')"><i class="ti ti-download" style="font-size:13px;vertical-align:-1px"></i> Export</button>
+  </div>
+  <div class="sg">
+    <div class="sc accent"><div class="sc-label">MTD Revenue</div><div class="sc-val" style="font-size:24px;">AED 68.4K</div><div class="sc-sub"><span class="sc-delta up">↑ 14%</span> vs Jun 2025</div></div>
+    <div class="sc success"><div class="sc-label">Memberships</div><div class="sc-val" style="font-size:24px;">AED 48K</div><div class="sc-sub">70% of total</div></div>
+    <div class="sc"><div class="sc-label">Classes</div><div class="sc-val" style="font-size:22px;">AED 11K</div></div>
+    <div class="sc gold" style="background:var(--gold-bg);border-color:rgba(160,121,10,0.18)"><div class="sc-label">Coffee shop</div><div class="sc-val" style="font-size:22px;color:var(--gold);">AED 6.2K</div></div>
+    <div class="sc"><div class="sc-label">Salon</div><div class="sc-val" style="font-size:22px;">AED 3.2K</div></div>
+  </div>
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="card-title">Daily revenue — June 2026</div>
+      <div class="bar-chart" style="height:120px;gap:2px;">
+        <div class="bar-col"><div class="bar-fill" style="height:60%"></div><div class="bar-lbl">1</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:50%"></div><div class="bar-lbl">2</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:75%"></div><div class="bar-lbl">3</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:65%"></div><div class="bar-lbl">4</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:80%"></div><div class="bar-lbl">5</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:55%"></div><div class="bar-lbl">6</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:45%"></div><div class="bar-lbl">7</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:70%"></div><div class="bar-lbl">8</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:85%"></div><div class="bar-lbl">9</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:90%"></div><div class="bar-lbl">10</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:78%"></div><div class="bar-lbl">11</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:88%"></div><div class="bar-lbl">12</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:72%"></div><div class="bar-lbl">13</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:60%"></div><div class="bar-lbl">14</div></div>
+        <div class="bar-col"><div class="bar-fill" style="height:68%"></div><div class="bar-lbl">15</div></div>
+        <div class="bar-col"><div class="bar-fill today" style="height:40%"></div><div class="bar-lbl">16</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Revenue by stream — June MTD</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
+        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;"><span>Memberships</span><span style="font-weight:500;">AED 48,000 <span style="color:var(--ink-light);font-weight:400;font-size:11px;">70%</span></span></div><div class="prog-bg" style="height:8px;"><div class="prog" style="width:70%;background:var(--blue);"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;"><span>Classes (drop-in)</span><span style="font-weight:500;">AED 11,000 <span style="color:var(--ink-light);font-weight:400;font-size:11px;">16%</span></span></div><div class="prog-bg" style="height:8px;"><div class="prog" style="width:16%;background:#7C4DFF;"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;"><span>Coffee shop</span><span style="font-weight:500;">AED 6,200 <span style="color:var(--ink-light);font-weight:400;font-size:11px;">9%</span></span></div><div class="prog-bg" style="height:8px;"><div class="prog" style="width:9%;background:var(--gold);"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;"><span>Hair salon</span><span style="font-weight:500;">AED 3,200 <span style="color:var(--ink-light);font-weight:400;font-size:11px;">5%</span></span></div><div class="prog-bg" style="height:8px;"><div class="prog" style="width:5%;background:#00897B;"></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MEMBERSHIPS MGMT ══ -->
+<div class="page" id="page-memberships">
+  <div class="ph">
+    <div class="ph-left"><div class="pt">Membership management</div><div class="ps">284 active · 12 expiring this week</div></div>
+    <button class="btn btn-rose" onclick="showToast('Bulk renewal reminders sent to all expiring members.')">Send bulk reminders</button>
+  </div>
+  <div class="sg">
+    <div class="sc"><div class="sc-label">Basic (AED 199/mo)</div><div class="sc-val">89</div><div class="sc-sub">AED 17,711 / mo</div></div>
+    <div class="sc accent"><div class="sc-label">Premium (AED 350/mo)</div><div class="sc-val">142</div><div class="sc-sub">AED 49,700 / mo</div></div>
+    <div class="sc gold" style="background:var(--gold-bg);border-color:rgba(160,121,10,0.18)"><div class="sc-label">VIP (AED 550/mo)</div><div class="sc-val" style="color:var(--gold)">53</div><div class="sc-sub">AED 29,150 / mo</div></div>
+    <div class="sc warning"><div class="sc-label">Expiring ≤7 days</div><div class="sc-val">12</div></div>
+    <div class="sc danger" style="background:var(--danger-bg);border-color:rgba(192,39,45,0.15)"><div class="sc-label">Lapsed / unpaid</div><div class="sc-val" style="color:var(--danger)">5</div></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div class="card-title" style="margin-bottom:0;">Expiring this week — action required</div>
+      <button class="btn btn-outline" onclick="showToast('All 12 renewal emails sent.')">Email all</button>
+    </div>
+    <table class="tbl">
+      <thead><tr><th>Member</th><th>Plan</th><th>Expires</th><th>Days left</th><th>Reminder sent</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td class="tbl-name">Lana Khoury</td><td><span class="badge gold">VIP</span></td><td>30 Jun 2026</td><td><span style="color:var(--warning);font-weight:500;">14 days</span></td><td><span class="badge success">Sent</span></td><td><button class="action-btn" onclick="showToast('Manual call logged for Lana.')">Log call</button></td></tr>
+        <tr><td class="tbl-name">Nadia Jabri</td><td><span class="badge neutral">Basic</span></td><td>20 Jun 2026</td><td><span style="color:var(--warning);font-weight:500;">4 days</span></td><td><span class="badge success">Sent</span></td><td><button class="action-btn" onclick="showToast('Manual call logged for Nadia.')">Log call</button></td></tr>
+        <tr><td class="tbl-name">Dana Mahmoud</td><td><span class="badge neutral">Basic</span></td><td>18 Jun 2026</td><td><span style="color:var(--danger);font-weight:600;">2 days</span></td><td><span class="badge warning">Pending</span></td><td><button class="action-btn" onclick="showToast('Reminder sent to Dana now.')">Send now</button></td></tr>
+        <tr><td class="tbl-name">Amal Farhat</td><td><span class="badge rose">Premium</span></td><td>17 Jun 2026</td><td><span style="color:var(--danger);font-weight:600;">1 day</span></td><td><span class="badge danger">None sent</span></td><td><button class="action-btn" onclick="showToast('Urgent reminder sent to Amal.')">Send now</button></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ REPORTS ══ -->
+<div class="page" id="page-reports">
+  <div class="ph">
+    <div class="ph-left"><div class="pt">Reports</div><div class="ps">Analytics and business insights</div></div>
+    <div style="display:flex;gap:8px;">
+      <select class="form-select" style="width:auto;padding:7px 12px;"><option>June 2026</option><option>May 2026</option><option>Q2 2026</option></select>
+      <button class="btn btn-rose" onclick="showToast('Full report exported as PDF.')"><i class="ti ti-download" style="font-size:13px;vertical-align:-1px"></i> Export PDF</button>
+    </div>
+  </div>
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="card">
+      <div class="card-title">Membership retention</div>
+      <div class="sg" style="grid-template-columns:1fr 1fr;margin-bottom:12px;">
+        <div class="sc success" style="padding:12px;"><div class="sc-label" style="font-size:9px;">Retention rate</div><div class="sc-val" style="font-size:26px;color:var(--success);">91%</div></div>
+        <div class="sc warning" style="padding:12px;"><div class="sc-label" style="font-size:9px;">Churn this month</div><div class="sc-val" style="font-size:26px;">9%</div></div>
+      </div>
+      <div style="font-size:12px;color:var(--ink-light);">Most common churn reason: relocation (42%), cost (28%), other (30%)</div>
+    </div>
+    <div class="card">
+      <div class="card-title">New members — June</div>
+      <div class="sg" style="grid-template-columns:1fr 1fr;margin-bottom:12px;">
+        <div class="sc accent" style="padding:12px;"><div class="sc-label" style="font-size:9px;">Joined this month</div><div class="sc-val" style="font-size:26px;">18</div></div>
+        <div class="sc" style="padding:12px;"><div class="sc-label" style="font-size:9px;">Trial conversions</div><div class="sc-val" style="font-size:26px;">7</div></div>
+      </div>
+      <div style="font-size:12px;color:var(--ink-light);">Top referral source: Instagram (55%), friend referral (30%), walk-in (15%)</div>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-title">Top classes by attendance — June</div>
+    <table class="tbl">
+      <thead><tr><th>Class</th><th>Instructor</th><th>Sessions</th><th>Total booked</th><th>Avg rating</th><th>Fill rate</th></tr></thead>
+      <tbody>
+        <tr><td class="tbl-name">Zumba</td><td>Instructor Dana</td><td>16</td><td>224</td><td>⭐ 4.9</td><td><div class="prog-bg" style="display:inline-block;width:80px;vertical-align:middle;"><div class="prog" style="width:96%;background:var(--success);"></div></div> 96%</td></tr>
+        <tr><td class="tbl-name">Boxing fundamentals</td><td>Coach Layla</td><td>12</td><td>144</td><td>⭐ 4.8</td><td><div class="prog-bg" style="display:inline-block;width:80px;vertical-align:middle;"><div class="prog" style="width:100%;background:var(--danger);"></div></div> 100%</td></tr>
+        <tr><td class="tbl-name">Pilates core flow</td><td>Instructor Nour</td><td>14</td><td>168</td><td>⭐ 4.7</td><td><div class="prog-bg" style="display:inline-block;width:80px;vertical-align:middle;"><div class="prog" style="width:80%;background:var(--blue);"></div></div> 80%</td></tr>
+        <tr><td class="tbl-name">Spin class</td><td>Coach Rima</td><td>12</td><td>180</td><td>⭐ 4.6</td><td><div class="prog-bg" style="display:inline-block;width:80px;vertical-align:middle;"><div class="prog" style="width:100%;background:var(--danger);"></div></div> 100%</td></tr>
+        <tr><td class="tbl-name">HIIT challenge</td><td>Coach Sara</td><td>10</td><td>85</td><td>⭐ 4.5</td><td><div class="prog-bg" style="display:inline-block;width:80px;vertical-align:middle;"><div class="prog" style="width:57%;background:var(--warning);"></div></div> 57%</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</main>
+
+<!-- MODALS -->
+<div class="modal-ov" id="modal-add-member" onclick="handleModalOvClick(event,'modal-add-member')">
+  <div class="modal-box">
+    <div class="modal-title">Add new member</div>
+    <div class="modal-sub">Create a new Queenix membership account</div>
+    <div class="form-row"><label class="form-label">Full name</label><input class="form-input" placeholder="e.g. Sara Al-Mansoori"></div>
+    <div class="form-row"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="sara@email.com"></div>
+    <div class="form-row"><label class="form-label">Phone</label><input class="form-input" placeholder="+971 50 000 0000"></div>
+    <div class="form-row"><label class="form-label">Membership plan</label><select class="form-select"><option>Basic — AED 199/mo</option><option>Premium — AED 350/mo</option><option>VIP — AED 550/mo</option><option>Annual — AED 3,200/yr</option></select></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('modal-add-member')">Cancel</button><button class="btn btn-rose" onclick="closeModal('modal-add-member');showToast('New member added successfully!')">Create member</button></div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modal-add-staff" onclick="handleModalOvClick(event,'modal-add-staff')">
+  <div class="modal-box">
+    <div class="modal-title">Add staff member</div>
+    <div class="modal-sub">Add a new team member to Queenix</div>
+    <div class="form-row"><label class="form-label">Full name</label><input class="form-input" placeholder="Full name"></div>
+    <div class="form-row"><label class="form-label">Role</label><select class="form-select"><option>Instructor</option><option>Receptionist</option><option>Stylist</option><option>Barista</option><option>Cleaner</option><option>Manager</option></select></div>
+    <div class="form-row"><label class="form-label">Department</label><select class="form-select"><option>Classes</option><option>Front desk</option><option>Salon</option><option>Coffee shop</option><option>Management</option></select></div>
+    <div class="form-row"><label class="form-label">Start date</label><input class="form-input" type="date"></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('modal-add-staff')">Cancel</button><button class="btn btn-rose" onclick="closeModal('modal-add-staff');showToast('Staff member added!')">Add staff</button></div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modal-add-class" onclick="handleModalOvClick(event,'modal-add-class')">
+  <div class="modal-box">
+    <div class="modal-title">Add class</div>
+    <div class="modal-sub">Schedule a new class session</div>
+    <div class="form-row"><label class="form-label">Class name</label><input class="form-input" placeholder="e.g. Yoga & mindfulness"></div>
+    <div class="form-row"><label class="form-label">Instructor</label><select class="form-select"><option>Coach Layla</option><option>Instructor Nour</option><option>Hana Yousif</option><option>Coach Rima</option><option>Coach Sara</option><option>Instructor Dana</option></select></div>
+    <div class="form-row"><label class="form-label">Date & time</label><input class="form-input" type="datetime-local"></div>
+    <div class="form-row"><label class="form-label">Capacity</label><input class="form-input" type="number" placeholder="15" min="1" max="50"></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('modal-add-class')">Cancel</button><button class="btn btn-rose" onclick="closeModal('modal-add-class');showToast('Class added to the schedule!')">Add class</button></div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modal-add-shift" onclick="handleModalOvClick(event,'modal-add-shift')">
+  <div class="modal-box">
+    <div class="modal-title">Add shift</div>
+    <div class="modal-sub">Assign a shift to a team member</div>
+    <div class="form-row"><label class="form-label">Staff member</label><select class="form-select"><option>Layla Hassan</option><option>Nour Saleh</option><option>Hana Yousif</option><option>Sara K.</option><option>Dina Rashid</option><option>Lina M.</option></select></div>
+    <div class="form-row"><label class="form-label">Date</label><input class="form-input" type="date"></div>
+    <div class="form-row"><label class="form-label">Start time</label><input class="form-input" type="time"></div>
+    <div class="form-row"><label class="form-label">End time</label><input class="form-input" type="time"></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('modal-add-shift')">Cancel</button><button class="btn btn-rose" onclick="closeModal('modal-add-shift');showToast('Shift added to the rota!')">Save shift</button></div>
+  </div>
+</div>
+
+<div class="modal-ov" id="modal-add-appt" onclick="handleModalOvClick(event,'modal-add-appt')">
+  <div class="modal-box">
+    <div class="modal-title">Add appointment</div>
+    <div class="modal-sub">Book a salon appointment manually</div>
+    <div class="form-row"><label class="form-label">Client name</label><input class="form-input" placeholder="Member name"></div>
+    <div class="form-row"><label class="form-label">Service</label><select class="form-select"><option>Blow-dry — AED 80</option><option>Cut & style — AED 150</option><option>Colour — AED 280</option><option>Hair treatment — AED 120</option></select></div>
+    <div class="form-row"><label class="form-label">Stylist</label><select class="form-select"><option>Sara K.</option><option>Lina M.</option><option>Rania H.</option></select></div>
+    <div class="form-row"><label class="form-label">Date & time</label><input class="form-input" type="datetime-local"></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('modal-add-appt')">Cancel</button><button class="btn btn-rose" onclick="closeModal('modal-add-appt');showToast('Appointment booked!')">Book appointment</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(function(item) {
+    if (item.getAttribute('onclick') && item.getAttribute('onclick').includes("'" + page + "'")) item.classList.add('active');
+  });
+  window.scrollTo(0, 0);
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function handleModalOvClick(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+function selTab(el) {
+  el.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function filterTable(val, tableId) {
+  var rows = document.querySelectorAll('#' + tableId + ' tbody tr');
+  rows.forEach(function(row) {
+    row.style.display = row.textContent.toLowerCase().includes(val.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function cycleOrder(btn) {
+  if (btn.classList.contains('preparing')) {
+    btn.textContent = 'Ready'; btn.className = 'order-status-btn ready';
+    showToast('Order marked as ready — member notified.');
+  } else if (btn.classList.contains('ready')) {
+    btn.textContent = 'Collected'; btn.className = 'order-status-btn done';
+    showToast('Order marked as collected.');
+  }
+}
+
+function updateClock() {
+  var now = new Date();
+  var h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+  var pad = n => n < 10 ? '0' + n : n;
+  var ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  document.getElementById('nav-clock').textContent = pad(h) + ':' + pad(m) + ':' + pad(s) + ' ' + ampm;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+var feedNames = ['Reem A.','Hessa N.','Lana Q.','Moza F.','Dana R.','Sara W.','Nadia B.'];
+var feedTypes = [
+  {icon:'ti-door-enter',bg:'var(--success-bg)',col:'var(--success)',text:'checked in'},
+  {icon:'ti-coffee',bg:'var(--gold-bg)',col:'var(--gold)',text:'placed a coffee order'},
+  {icon:'ti-barbell',bg:'var(--blue-pale)',col:'var(--blue)',text:'booked a class'},
+  {icon:'ti-door-exit',bg:'var(--danger-bg)',col:'var(--danger)',text:'checked out'},
+];
+function addFeedItem() {
+  var feed = document.getElementById('activity-feed');
+  if (!feed) return;
+  var name = feedNames[Math.floor(Math.random()*feedNames.length)];
+  var type = feedTypes[Math.floor(Math.random()*feedTypes.length)];
+  var now = new Date();
+  var h = now.getHours(), m = now.getMinutes();
+  var pad = n => n < 10 ? '0' + n : n;
+  var time = pad(h) + ':' + pad(m);
+  var el = document.createElement('div');
+  el.className = 'feed-item';
+  el.style.opacity = '0';
+  el.innerHTML = '<div class="feed-icon" style="background:' + type.bg + ';color:' + type.col + '"><i class="ti ' + type.icon + '" style="font-size:13px"></i></div><div class="feed-text"><strong>' + name + '</strong> ' + type.text + '</div><div class="feed-time">' + time + '</div>';
+  feed.insertBefore(el, feed.firstChild);
+  setTimeout(function(){ el.style.transition='opacity 0.4s'; el.style.opacity='1'; }, 10);
+  if (feed.children.length > 7) feed.removeChild(feed.lastChild);
+}
+setInterval(addFeedItem, 8000);
+</script>
+</body>
+</html>
