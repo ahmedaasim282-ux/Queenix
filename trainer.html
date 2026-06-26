@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queenix — Trainer Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root{
+  --black:#080808;--dark:#0F0F0F;--card:#161616;--card2:#1E1E1E;--card3:#242424;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --white:#FFF;--g1:#DADADA;--g2:#909090;--g3:#505050;
+  --purple:#A855F7;--purple-d:#9333EA;--purple-l:#C084FC;
+  --purple-bg:rgba(168,85,247,0.10);--purple-bd:rgba(168,85,247,0.28);
+  --success:#22C55E;--success-bg:rgba(34,197,94,0.10);--success-bd:rgba(34,197,94,0.28);
+  --warning:#F59E0B;--warning-bg:rgba(245,158,11,0.10);--warning-bd:rgba(245,158,11,0.28);
+  --danger:#EF4444;--danger-bg:rgba(239,68,68,0.10);--danger-bd:rgba(239,68,68,0.28);
+  --blue:#1E90FF;--blue-bg:rgba(30,144,255,0.10);--blue-bd:rgba(30,144,255,0.28);
+  --fd:'Rajdhani',system-ui,sans-serif;--fb:'Inter',system-ui,sans-serif;
+  --r:10px;--r-sm:6px;--r-lg:14px;--r-pill:99px;
+  --nav-h:60px;--sidebar-w:240px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--fb);background:var(--black);color:var(--g1);font-size:14px;line-height:1.55;min-height:100vh;}
+input,select,textarea,button{font-family:var(--fb);}
+
+/* NAV */
+.topnav{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-h);background:var(--dark);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px 0 0;}
+.nav-brand{display:flex;align-items:center;gap:10px;width:var(--sidebar-w);padding:0 20px;height:100%;border-right:1px solid var(--border);}
+.brand-name{font-family:var(--fd);font-size:22px;font-weight:700;color:var(--white);letter-spacing:0.06em;}
+.brand-sub{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--g3);margin-top:-2px;}
+.nav-right{display:flex;align-items:center;gap:14px;}
+.nav-clock{font-size:12px;color:var(--g3);}
+.nav-icon-btn{font-size:18px;color:var(--g3);cursor:pointer;padding:4px;transition:color 0.15s;border:none;background:none;}
+.nav-icon-btn:hover{color:var(--g1);}
+.trainer-chip{display:flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border-radius:var(--r-pill);background:var(--purple-bg);border:1px solid var(--purple-bd);cursor:pointer;}
+.trainer-chip-av{width:26px;height:26px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;}
+.trainer-chip span{font-size:12px;color:var(--purple-l);}
+.status-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:var(--r-pill);font-size:11px;font-weight:500;}
+.status-pill.online{background:var(--success-bg);border:1px solid var(--success-bd);color:var(--success);}
+.pulse{width:6px;height:6px;border-radius:50%;background:currentColor;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:var(--nav-h);left:0;bottom:0;width:var(--sidebar-w);background:var(--dark);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px 0;overflow-y:auto;z-index:90;}
+.sb-label{font-size:9px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--g3);padding:12px 18px 5px;}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:13px;color:var(--g2);cursor:pointer;transition:all 0.12s;border-left:2px solid transparent;}
+.sb-item i{font-size:17px;}
+.sb-item:hover{color:var(--white);background:rgba(255,255,255,0.04);}
+.sb-item.active{color:var(--purple-l);background:var(--purple-bg);border-left-color:var(--purple);}
+.sb-divider{height:1px;background:var(--border);margin:8px 18px;}
+.sb-profile-card{margin:auto 14px 0;background:var(--card);border:1px solid var(--purple-bd);border-radius:var(--r-lg);padding:14px;text-align:center;}
+.sb-av{width:48px;height:48px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:18px;font-weight:700;color:#fff;margin:0 auto 8px;}
+.sb-name{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--white);letter-spacing:0.03em;}
+.sb-role{font-size:10px;color:var(--purple-l);margin-top:2px;}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);margin-top:var(--nav-h);min-height:calc(100vh - var(--nav-h));padding:28px;}
+.page{display:none;}
+.page.active{display:block;animation:fi 0.18s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+/* PAGE HEADERS */
+.ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;gap:16px;flex-wrap:wrap;}
+.pt{font-family:var(--fd);font-size:28px;font-weight:700;color:var(--white);letter-spacing:0.04em;}
+.ps{font-size:13px;color:var(--g2);margin-top:2px;}
+
+/* STAT GRID */
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.sc{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;}
+.sc.purple{border-color:var(--purple-bd);background:var(--purple-bg);}
+.sc.green{border-color:var(--success-bd);background:var(--success-bg);}
+.sc.amber{border-color:var(--warning-bd);background:var(--warning-bg);}
+.sc-label{font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--g3);margin-bottom:6px;}
+.sc-val{font-family:var(--fd);font-size:28px;font-weight:700;color:var(--white);}
+.sc.purple .sc-val{color:var(--purple-l);}
+.sc.green .sc-val{color:var(--success);}
+.sc.amber .sc-val{color:var(--warning);}
+.sc-sub{font-size:11px;color:var(--g3);margin-top:4px;}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:18px;margin-bottom:16px;}
+.card-title{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--white);letter-spacing:0.03em;margin-bottom:12px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* SESSION ROWS */
+.session-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);}
+.session-row:last-child{border-bottom:none;}
+.session-time{font-family:var(--fd);font-size:17px;font-weight:600;color:var(--purple-l);min-width:80px;}
+.session-info{flex:1;}
+.session-name{font-size:13px;font-weight:500;color:var(--white);}
+.session-type{font-size:11px;color:var(--g3);margin-top:2px;}
+.session-badge{font-size:10px;padding:3px 9px;border-radius:var(--r-pill);font-weight:600;}
+.session-badge.confirmed{background:var(--success-bg);color:var(--success);border:1px solid var(--success-bd);}
+.session-badge.pending{background:var(--warning-bg);color:var(--warning);border:1px solid var(--warning-bd);}
+.session-badge.done{background:var(--card2);color:var(--g3);border:1px solid var(--border);}
+
+/* MEMBER ROWS */
+.member-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);}
+.member-row:last-child{border-bottom:none;}
+.member-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.member-info{flex:1;}
+.member-name{font-size:13px;font-weight:500;color:var(--white);}
+.member-meta{font-size:11px;color:var(--g3);margin-top:2px;}
+.member-badge{font-size:10px;padding:3px 9px;border-radius:var(--r-pill);font-weight:600;background:var(--purple-bg);color:var(--purple-l);border:1px solid var(--purple-bd);}
+
+/* PROFILE */
+.profile-av-large{width:80px;height:80px;border-radius:50%;background:var(--purple);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:28px;font-weight:700;color:#fff;margin-bottom:12px;}
+.specialty-tag{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:var(--r-pill);background:var(--purple-bg);color:var(--purple-l);border:1px solid var(--purple-bd);font-size:12px;margin:4px;}
+.form-label{font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--g3);display:block;margin-bottom:6px;margin-top:14px;}
+.form-input{width:100%;padding:10px 13px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);font-size:13px;color:var(--white);outline:none;transition:border-color 0.15s;}
+.form-input:focus{border-color:var(--purple);}
+.form-select{width:100%;padding:10px 13px;background:var(--card2);border:1px solid var(--border2);border-radius:var(--r);font-size:13px;color:var(--white);outline:none;}
+.avail-toggle{display:flex;align-items:center;gap:12px;padding:14px;background:var(--card2);border:1px solid var(--border);border-radius:var(--r-lg);cursor:pointer;transition:border-color 0.2s;}
+.avail-toggle.active{border-color:var(--success-bd);background:var(--success-bg);}
+.toggle-dot{width:40px;height:22px;border-radius:var(--r-pill);background:var(--card3);position:relative;transition:background 0.2s;flex-shrink:0;}
+.toggle-dot::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--g3);transition:all 0.2s;}
+.avail-toggle.active .toggle-dot{background:var(--success);}
+.avail-toggle.active .toggle-dot::after{left:21px;background:#fff;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all 0.15s;}
+.btn-purple{background:var(--purple);color:#fff;}
+.btn-purple:hover{background:var(--purple-d);}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--g2);}
+.btn-outline:hover{color:var(--white);border-color:var(--purple-bd);}
+
+@media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;}.sg{grid-template-columns:1fr 1fr;}.two-col{grid-template-columns:1fr;}}
+</style>
+
+<!-- Supabase SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+const _SUPABASE_URL  = 'https://xnkupxjffbizkoexttdf.supabase.co';
+const _SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhua3VweGpmZmJpemtvZXh0dGRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3MjA0OTgsImV4cCI6MjA5NzI5NjQ5OH0.rn6G9kLyGRGe66fUs_aiYPX9NWT-lNFNIihPA7oe4YQ';
+const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
+
+(async function() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { window.location.replace('/'); return; }
+  const meta = session.user.user_metadata || {};
+  const role = meta.role || '';
+  if (role !== 'trainer') { window.location.replace('/'); return; }
+  const name  = meta.full_name || session.user.email;
+  const fname = name.split(' ')[0];
+  const initials = name.split(' ').slice(0,2).map(function(w){ return w[0]; }).join('').toUpperCase();
+  sessionStorage.setItem('qx_role', role);
+  sessionStorage.setItem('qx_name', name);
+  document.addEventListener('DOMContentLoaded', function() {
+    var els = document.querySelectorAll('.trainer-name-placeholder'); els.forEach(function(e){ e.textContent = name; });
+    var fels = document.querySelectorAll('.trainer-fname-placeholder'); fels.forEach(function(e){ e.textContent = fname; });
+    var iels = document.querySelectorAll('.trainer-initials-placeholder'); iels.forEach(function(e){ e.textContent = initials; });
+    var emailEls = document.querySelectorAll('.trainer-email-placeholder'); emailEls.forEach(function(e){ e.textContent = session.user.email; });
+  });
+})();
+</script>
+</head>
+<body>
+
+<!-- TOPNAV -->
+<header class="topnav">
+  <div class="nav-brand">
+    <svg width="32" height="32" viewBox="0 0 34 34" fill="none"><rect x="2" y="13" width="4" height="8" rx="1.5" fill="#A855F7"/><rect x="28" y="13" width="4" height="8" rx="1.5" fill="#A855F7"/><rect x="6" y="10" width="3" height="14" rx="1.5" fill="#A855F7"/><rect x="25" y="10" width="3" height="14" rx="1.5" fill="#A855F7"/><rect x="9" y="15.5" width="16" height="3" rx="1.5" fill="#A855F7"/><rect x="13" y="7" width="3" height="6" rx="1.5" fill="#A855F7"/><rect x="18" y="7" width="3" height="6" rx="1.5" fill="#A855F7"/><rect x="13" y="21" width="3" height="6" rx="1.5" fill="#A855F7"/><rect x="18" y="21" width="3" height="6" rx="1.5" fill="#A855F7"/></svg>
+    <div><div class="brand-name">QUEENIX</div><div class="brand-sub">Trainer Portal</div></div>
+  </div>
+  <div class="nav-right">
+    <div class="status-pill online"><div class="pulse"></div>Available</div>
+    <span class="nav-clock" id="nav-clock">—</span>
+    <button class="nav-icon-btn" onclick="doSignOut()" title="Sign out"><i class="ti ti-logout"></i></button>
+    <div class="trainer-chip">
+      <div class="trainer-chip-av trainer-initials-placeholder">LH</div>
+      <span class="trainer-fname-placeholder">Layla</span>
+    </div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-label">Trainer</div>
+  <a class="sb-item active" onclick="goTo('dashboard')"><i class="ti ti-layout-dashboard"></i>Dashboard</a>
+  <a class="sb-item" onclick="goTo('sessions')"><i class="ti ti-calendar"></i>My sessions</a>
+  <a class="sb-item" onclick="goTo('members')"><i class="ti ti-users"></i>My members</a>
+  <div class="sb-divider"></div>
+  <div class="sb-label">Account</div>
+  <a class="sb-item" onclick="goTo('profile')"><i class="ti ti-user-circle"></i>My profile</a>
+  <a class="sb-item" onclick="doSignOut()"><i class="ti ti-logout"></i>Sign out</a>
+  <div class="sb-profile-card">
+    <div class="sb-av trainer-initials-placeholder">LH</div>
+    <div class="sb-name trainer-name-placeholder">Layla Hassan</div>
+    <div class="sb-role">Outsourced Trainer</div>
+  </div>
+</aside>
+
+<main class="main">
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="ph">
+    <div>
+      <div class="pt" id="dash-greeting">Good morning, Layla</div>
+      <div class="ps" id="dash-date">Here's your schedule for today</div>
+    </div>
+  </div>
+  <div class="sg">
+    <div class="sc purple"><div class="sc-label">Today's sessions</div><div class="sc-val">4</div><div class="sc-sub">2 confirmed · 2 pending</div></div>
+    <div class="sc green"><div class="sc-label">Active members</div><div class="sc-val">24</div><div class="sc-sub">Assigned to you</div></div>
+    <div class="sc amber"><div class="sc-label">This week</div><div class="sc-val">18</div><div class="sc-sub">Sessions completed</div></div>
+    <div class="sc"><div class="sc-label">Your rating</div><div class="sc-val">4.9</div><div class="sc-sub">From member reviews</div></div>
+  </div>
+  <div class="two-col">
+    <div>
+      <div class="card-title">Today's sessions</div>
+      <div class="card">
+        <div class="session-row">
+          <div class="session-time">7:00 AM</div>
+          <div class="session-info"><div class="session-name">Sara Al-Mansoori</div><div class="session-type">Personal training · 1hr · Studio A</div></div>
+          <div class="session-badge confirmed">Confirmed</div>
+        </div>
+        <div class="session-row">
+          <div class="session-time">9:00 AM</div>
+          <div class="session-info"><div class="session-name">Hana Al-Zaabi</div><div class="session-type">HIIT Group session · 1hr · Studio B</div></div>
+          <div class="session-badge confirmed">Confirmed</div>
+        </div>
+        <div class="session-row">
+          <div class="session-time">11:00 AM</div>
+          <div class="session-info"><div class="session-name">Mariam Al-Rashid</div><div class="session-type">Strength training · 1hr · Studio A</div></div>
+          <div class="session-badge pending">Pending</div>
+        </div>
+        <div class="session-row">
+          <div class="session-time">5:00 PM</div>
+          <div class="session-info"><div class="session-name">Fatima Noor</div><div class="session-type">Assessment & plan · 45min · Studio C</div></div>
+          <div class="session-badge pending">Pending</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card-title">Recent members</div>
+      <div class="card">
+        <div class="member-row">
+          <div class="member-av" style="background:#A855F7">SA</div>
+          <div class="member-info"><div class="member-name">Sara Al-Mansoori</div><div class="member-meta">Last session: Today · 7:00 AM</div></div>
+          <div class="member-badge">Premium</div>
+        </div>
+        <div class="member-row">
+          <div class="member-av" style="background:#EC4899">HZ</div>
+          <div class="member-info"><div class="member-name">Hana Al-Zaabi</div><div class="member-meta">Last session: Yesterday</div></div>
+          <div class="member-badge">VIP</div>
+        </div>
+        <div class="member-row">
+          <div class="member-av" style="background:#F59E0B">MR</div>
+          <div class="member-info"><div class="member-name">Mariam Al-Rashid</div><div class="member-meta">Last session: 2 days ago</div></div>
+          <div class="member-badge">Premium</div>
+        </div>
+        <div class="member-row">
+          <div class="member-av" style="background:#22C55E">FN</div>
+          <div class="member-info"><div class="member-name">Fatima Noor</div><div class="member-meta">Last session: 5 days ago</div></div>
+          <div class="member-badge">Standard</div>
+        </div>
+        <div style="margin-top:8px;text-align:center">
+          <button class="btn btn-outline" onclick="goTo('members')">View all 24 members</button>
+        </div>
+      </div>
+      <div class="card-title">Weekly summary</div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--g2);margin-bottom:8px"><span>Sessions completed</span><span style="color:var(--white);font-weight:600">18 / 22</span></div>
+        <div style="height:5px;background:var(--border2);border-radius:99px;overflow:hidden;margin-bottom:14px"><div style="height:100%;background:var(--purple);border-radius:99px;width:82%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--g2);margin-bottom:8px"><span>Hours trained</span><span style="color:var(--white);font-weight:600">21 hrs</span></div>
+        <div style="height:5px;background:var(--border2);border-radius:99px;overflow:hidden"><div style="height:100%;background:var(--success);border-radius:99px;width:70%"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MY SESSIONS -->
+<div class="page" id="page-sessions">
+  <div class="ph"><div><div class="pt">My Sessions</div><div class="ps">All your training sessions — upcoming and past</div></div></div>
+  <div style="display:flex;gap:8px;margin-bottom:20px">
+    <button class="btn btn-purple" id="sess-tab-upcoming" onclick="switchSessionTab('upcoming')">Upcoming</button>
+    <button class="btn btn-outline" id="sess-tab-past" onclick="switchSessionTab('past')">Past sessions</button>
+  </div>
+  <div id="sessions-upcoming">
+    <div class="card">
+      <div class="session-row"><div class="session-time">Today 5:00 PM</div><div class="session-info"><div class="session-name">Fatima Noor</div><div class="session-type">Assessment & plan · 45min · Studio C</div></div><div class="session-badge pending">Pending</div></div>
+      <div class="session-row"><div class="session-time">Thu 7:00 AM</div><div class="session-info"><div class="session-name">Sara Al-Mansoori</div><div class="session-type">Personal training · 1hr · Studio A</div></div><div class="session-badge confirmed">Confirmed</div></div>
+      <div class="session-row"><div class="session-time">Thu 9:00 AM</div><div class="session-info"><div class="session-name">Hana Al-Zaabi</div><div class="session-type">HIIT Group session · 1hr · Studio B</div></div><div class="session-badge confirmed">Confirmed</div></div>
+      <div class="session-row"><div class="session-time">Fri 10:00 AM</div><div class="session-info"><div class="session-name">Mariam Al-Rashid</div><div class="session-type">Strength training · 1hr · Studio A</div></div><div class="session-badge confirmed">Confirmed</div></div>
+      <div class="session-row"><div class="session-time">Sat 8:00 AM</div><div class="session-info"><div class="session-name">Noura Al-Ali</div><div class="session-type">Yoga · 1hr · Studio D</div></div><div class="session-badge pending">Pending</div></div>
+    </div>
+  </div>
+  <div id="sessions-past" style="display:none">
+    <div class="card">
+      <div class="session-row"><div class="session-time">Yesterday</div><div class="session-info"><div class="session-name">Hana Al-Zaabi</div><div class="session-type">HIIT · 1hr · Studio B</div></div><div class="session-badge done">Done</div></div>
+      <div class="session-row"><div class="session-time">Mon 7:00 AM</div><div class="session-info"><div class="session-name">Sara Al-Mansoori</div><div class="session-type">Personal training · 1hr · Studio A</div></div><div class="session-badge done">Done</div></div>
+      <div class="session-row"><div class="session-time">Mon 11:00 AM</div><div class="session-info"><div class="session-name">Mariam Al-Rashid</div><div class="session-type">Strength · 1hr · Studio A</div></div><div class="session-badge done">Done</div></div>
+      <div class="session-row"><div class="session-time">Sun 9:00 AM</div><div class="session-info"><div class="session-name">Fatima Noor</div><div class="session-type">Cardio · 45min · Studio C</div></div><div class="session-badge done">Done</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MY MEMBERS -->
+<div class="page" id="page-members">
+  <div class="ph"><div><div class="pt">My Members</div><div class="ps">All members currently assigned to you</div></div></div>
+  <div class="sg" style="grid-template-columns:repeat(3,1fr)">
+    <div class="sc purple"><div class="sc-label">Total members</div><div class="sc-val">24</div></div>
+    <div class="sc green"><div class="sc-label">Active this week</div><div class="sc-val">18</div></div>
+    <div class="sc"><div class="sc-label">Avg. sessions/wk</div><div class="sc-val">2.4</div></div>
+  </div>
+  <div class="card">
+    <div class="member-row"><div class="member-av" style="background:#A855F7">SA</div><div class="member-info"><div class="member-name">Sara Al-Mansoori</div><div class="member-meta">Premium · HIIT, Strength · 3 sessions/wk</div></div><div class="member-badge">Active</div></div>
+    <div class="member-row"><div class="member-av" style="background:#EC4899">HZ</div><div class="member-info"><div class="member-name">Hana Al-Zaabi</div><div class="member-meta">VIP · HIIT, Cardio · 4 sessions/wk</div></div><div class="member-badge">Active</div></div>
+    <div class="member-row"><div class="member-av" style="background:#F59E0B">MR</div><div class="member-info"><div class="member-name">Mariam Al-Rashid</div><div class="member-meta">Premium · Strength · 2 sessions/wk</div></div><div class="member-badge">Active</div></div>
+    <div class="member-row"><div class="member-av" style="background:#22C55E">FN</div><div class="member-info"><div class="member-name">Fatima Noor</div><div class="member-meta">Standard · Cardio, Yoga · 1 session/wk</div></div><div class="member-badge">Active</div></div>
+    <div class="member-row"><div class="member-av" style="background:#1E90FF">NA</div><div class="member-info"><div class="member-name">Noura Al-Ali</div><div class="member-meta">Premium · Yoga · 2 sessions/wk</div></div><div class="member-badge">Active</div></div>
+    <div class="member-row"><div class="member-av" style="background:#14B8A6">LA</div><div class="member-info"><div class="member-name">Lina Al-Ahmadi</div><div class="member-meta">VIP · Pilates, Strength · 3 sessions/wk</div></div><div class="member-badge">Active</div></div>
+    <div style="margin-top:12px;text-align:center;font-size:12px;color:var(--g3)">+ 18 more members</div>
+  </div>
+</div>
+
+<!-- MY PROFILE -->
+<div class="page" id="page-profile">
+  <div class="ph"><div><div class="pt">My Profile</div><div class="ps">Your trainer profile as seen by members</div></div></div>
+  <div class="two-col">
+    <div>
+      <div class="card" style="text-align:center;padding:28px">
+        <div class="profile-av-large trainer-initials-placeholder" style="margin:0 auto 12px">LH</div>
+        <div style="font-family:var(--fd);font-size:22px;font-weight:700;color:var(--white);letter-spacing:0.04em" class="trainer-name-placeholder">Layla Hassan</div>
+        <div style="font-size:12px;color:var(--g3);margin-bottom:14px">Outsourced Fitness Trainer</div>
+        <div id="avail-toggle" class="avail-toggle active" onclick="toggleAvailability()">
+          <div class="toggle-dot"></div>
+          <div><div style="font-size:13px;font-weight:500;color:var(--white)" id="avail-label">Available for bookings</div><div style="font-size:11px;color:var(--g3)">Members can book sessions</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Specialties</div>
+        <div>
+          <span class="specialty-tag"><i class="ti ti-bolt" style="font-size:11px"></i>HIIT</span>
+          <span class="specialty-tag"><i class="ti ti-barbell" style="font-size:11px"></i>Strength</span>
+          <span class="specialty-tag"><i class="ti ti-leaf" style="font-size:11px"></i>Yoga</span>
+          <span class="specialty-tag"><i class="ti ti-flame" style="font-size:11px"></i>Cardio</span>
+          <span class="specialty-tag"><i class="ti ti-refresh" style="font-size:11px"></i>Functional</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-title">Edit profile</div>
+        <label class="form-label">Full name</label>
+        <input class="form-input trainer-name-placeholder" value="Layla Hassan" id="profile-name">
+        <label class="form-label">Email</label>
+        <input class="form-input trainer-email-placeholder" value="trainer@queenix.com" id="profile-email" readonly style="opacity:0.5">
+        <label class="form-label">Bio</label>
+        <textarea class="form-input" rows="4" id="profile-bio" style="resize:vertical">7 years of experience in functional training and HIIT. Specialises in body transformation and strength building for women.</textarea>
+        <label class="form-label">Experience</label>
+        <select class="form-select" id="profile-exp">
+          <option>7 years</option>
+          <option>5 years</option>
+          <option>3 years</option>
+          <option>1 year</option>
+        </select>
+        <label class="form-label">Phone</label>
+        <input class="form-input" placeholder="+971 50 000 0000" id="profile-phone">
+        <div style="margin-top:18px">
+          <button class="btn btn-purple" onclick="saveProfile()"><i class="ti ti-check"></i>Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+function goTo(p) {
+  document.querySelectorAll('.page').forEach(function(x){ x.classList.remove('active'); });
+  document.querySelectorAll('.sb-item').forEach(function(x){ x.classList.remove('active'); });
+  var pg = document.getElementById('page-'+p);
+  if (pg) pg.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(function(i){
+    if (i.getAttribute('onclick') && i.getAttribute('onclick').indexOf("'"+p+"'") > -1) i.classList.add('active');
+  });
+  window.scrollTo(0,0);
+}
+
+function updateClock() {
+  var now = new Date(), h=now.getHours(), m=now.getMinutes(), s=now.getSeconds();
+  var ampm = h>=12?'PM':'AM'; h = h%12||12;
+  var pad = function(n){ return n<10?'0'+n:n; };
+  var el = document.getElementById('nav-clock');
+  if (el) el.textContent = pad(h)+':'+pad(m)+':'+pad(s)+' '+ampm;
+}
+setInterval(updateClock, 1000); updateClock();
+
+document.addEventListener('DOMContentLoaded', function() {
+  var now = new Date(), h = now.getHours();
+  var g = h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  var fname = (sessionStorage.getItem('qx_name') || 'Trainer').split(' ')[0];
+  var gr = document.getElementById('dash-greeting');
+  if (gr) gr.textContent = g + ', ' + fname;
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var dl = document.getElementById('dash-date');
+  if (dl) dl.textContent = days[now.getDay()] + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
+});
+
+function switchSessionTab(tab) {
+  document.getElementById('sessions-upcoming').style.display = tab==='upcoming'?'block':'none';
+  document.getElementById('sessions-past').style.display = tab==='past'?'block':'none';
+  document.getElementById('sess-tab-upcoming').className = tab==='upcoming'?'btn btn-purple':'btn btn-outline';
+  document.getElementById('sess-tab-past').className = tab==='past'?'btn btn-purple':'btn btn-outline';
+}
+
+function toggleAvailability() {
+  var el = document.getElementById('avail-toggle');
+  var lbl = document.getElementById('avail-label');
+  el.classList.toggle('active');
+  lbl.textContent = el.classList.contains('active') ? 'Available for bookings' : 'Currently unavailable';
+}
+
+function saveProfile() {
+  alert('Profile saved!');
+}
+
+async function doSignOut() {
+  if (confirm('Sign out of Queenix Trainer Portal?')) {
+    await _sb.auth.signOut();
+    sessionStorage.clear();
+    window.location.replace('/');
+  }
+}
+</script>
+</body>
+</html>

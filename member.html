@@ -292,6 +292,26 @@ input,select,textarea,button{font-family:var(--fb);}
 .prog{height:100%;border-radius:var(--r-pill);}
 
 @media(max-width:900px){.sidebar{display:none;}.main{margin-left:0;}.two-col,.coffee-grid,.salon-grid{grid-template-columns:1fr;}}
+
+/* TRAINER CARDS */
+.trainer-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;display:flex;flex-direction:column;gap:12px;transition:border-color 0.2s;}
+.trainer-card:hover{border-color:rgba(168,85,247,0.35);}
+.trainer-av{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:20px;font-weight:700;color:#fff;flex-shrink:0;}
+.trainer-header{display:flex;align-items:center;gap:14px;}
+.trainer-name{font-family:var(--fd);font-size:17px;font-weight:700;color:var(--white);letter-spacing:0.03em;}
+.trainer-title{font-size:11px;color:var(--g3);margin-top:2px;}
+.trainer-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:var(--r-pill);}
+.trainer-status.online{background:var(--success-bg);color:var(--success);border:1px solid var(--success-bd);}
+.trainer-status.offline{background:var(--card2);color:var(--g3);border:1px solid var(--border);}
+.trainer-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.trainer-tag{font-size:10px;padding:3px 9px;border-radius:var(--r-pill);background:rgba(168,85,247,0.12);color:#c084fc;border:1px solid rgba(168,85,247,0.25);}
+.trainer-bio{font-size:12px;color:var(--g2);line-height:1.6;}
+.trainer-stats{display:flex;gap:16px;}
+.trainer-stat{text-align:center;}
+.trainer-stat-val{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--white);}
+.trainer-stat-lbl{font-size:10px;color:var(--g3);}
+.trainer-filter{padding:6px 14px;border-radius:var(--r-pill);border:1px solid var(--border2);background:transparent;color:var(--g2);font-size:12px;cursor:pointer;transition:all 0.15s;font-family:var(--fb);}
+.trainer-filter:hover,.trainer-filter.active{background:rgba(168,85,247,0.12);border-color:rgba(168,85,247,0.35);color:#c084fc;}
 </style>
 
 
@@ -376,6 +396,7 @@ const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
   <a class="sb-item" onclick="goTo('memberships')"><i class="ti ti-crown"></i>Memberships</a>
   <div class="sb-divider"></div>
   <div class="sb-label">Discover</div>
+  <a class="sb-item" onclick="goTo('trainers')"><i class="ti ti-barbell"></i>Trainers</a>
   <a class="sb-item" onclick="goTo('events')"><i class="ti ti-speakerphone"></i>Events & promos</a>
   <a class="sb-item" onclick="goTo('tracker')"><i class="ti ti-chart-line"></i>Fitness tracker</a>
   <a class="sb-item" onclick="goTo('rewards')"><i class="ti ti-star"></i>Loyalty rewards</a>
@@ -435,7 +456,7 @@ const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
         <div class="quick-action" onclick="goTo('classes')"><i class="ti ti-barbell"></i><span>Book a class</span></div>
         <div class="quick-action" onclick="goTo('coffee')"><i class="ti ti-coffee"></i><span>Order coffee</span></div>
         <div class="quick-action" onclick="goTo('salon')"><i class="ti ti-scissors"></i><span>Book salon</span></div>
-        <div class="quick-action" onclick="goTo('portal')"><i class="ti ti-user-circle"></i><span>My profile</span></div>
+        <div class="quick-action" onclick="goTo('trainers')"><i class="ti ti-user-star"></i><span>Find trainer</span></div>
       </div>
     </div>
   </div>
@@ -617,6 +638,57 @@ const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
 </div>
 
 <!-- REWARDS -->
+<div class="page" id="page-trainers">
+  <div class="ph"><div class="ph-left"><div class="pt">Our Trainers</div><div class="ps">Certified outsourced trainers available for personal sessions</div></div></div>
+  <div class="sg" style="margin-bottom:24px">
+    <div class="sc blue"><div class="sc-label">Available now</div><div class="sc-val">3</div><div class="sc-sub">Trainers online</div></div>
+    <div class="sc green"><div class="sc-label">Session types</div><div class="sc-val">6</div><div class="sc-sub">Specialties</div></div>
+    <div class="sc"><div class="sc-label">Avg. rating</div><div class="sc-val">4.8</div><div class="sc-sub">From members</div></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px" id="trainer-filters">
+    <button class="trainer-filter active" onclick="filterTrainers('all',this)">All</button>
+    <button class="trainer-filter" onclick="filterTrainers('HIIT',this)">HIIT</button>
+    <button class="trainer-filter" onclick="filterTrainers('Yoga',this)">Yoga</button>
+    <button class="trainer-filter" onclick="filterTrainers('Pilates',this)">Pilates</button>
+    <button class="trainer-filter" onclick="filterTrainers('Strength',this)">Strength</button>
+    <button class="trainer-filter" onclick="filterTrainers('Dance',this)">Dance Fitness</button>
+    <button class="trainer-filter" onclick="filterTrainers('CrossFit',this)">CrossFit</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px" id="trainer-cards"></div>
+  <!-- Book Session Modal -->
+  <div class="modal-ov" id="modal-book-trainer" onclick="if(event.target===this)closeModal('modal-book-trainer')">
+    <div class="modal-box" style="max-width:420px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-family:var(--fd);font-size:22px;font-weight:700;color:var(--white)" id="book-trainer-title">Book Session</div>
+        <div class="nav-icon-btn" onclick="closeModal('modal-book-trainer')"><i class="ti ti-x"></i></div>
+      </div>
+      <div style="font-size:13px;color:var(--g2);margin-bottom:16px" id="book-trainer-sub"></div>
+      <label class="form-label">Session type</label>
+      <select class="form-select" id="book-session-type" style="margin-bottom:12px">
+        <option>Personal training (1hr)</option>
+        <option>Group session (1hr)</option>
+        <option>Assessment & plan (45min)</option>
+      </select>
+      <label class="form-label">Preferred date</label>
+      <input class="form-input" type="date" id="book-trainer-date" style="margin-bottom:12px">
+      <label class="form-label">Preferred time</label>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px" id="trainer-time-slots">
+        <div class="time-slot" onclick="selectTrainerSlot(this)">7:00 AM</div>
+        <div class="time-slot" onclick="selectTrainerSlot(this)">8:00 AM</div>
+        <div class="time-slot" onclick="selectTrainerSlot(this)">9:00 AM</div>
+        <div class="time-slot" onclick="selectTrainerSlot(this)">10:00 AM</div>
+        <div class="time-slot" onclick="selectTrainerSlot(this)">5:00 PM</div>
+        <div class="time-slot" onclick="selectTrainerSlot(this)">6:00 PM</div>
+        <div class="time-slot" onclick="selectTrainerSlot(this)">7:00 PM</div>
+        <div class="time-slot" onclick="selectTrainerSlot(this)">8:00 PM</div>
+      </div>
+      <label class="form-label">Notes (optional)</label>
+      <input class="form-input" id="book-trainer-notes" placeholder="Goals, injuries, preferences…" style="margin-bottom:20px">
+      <button class="checkout-btn" onclick="confirmTrainerBooking()"><i class="ti ti-calendar-check"></i> Confirm booking</button>
+    </div>
+  </div>
+</div>
+
 <div class="page" id="page-rewards">
   <div class="ph"><div class="ph-left"><div class="pt">Loyalty rewards</div><div class="ps">Earn points every visit, class, and purchase</div></div></div>
   <div class="sg">
@@ -1500,6 +1572,95 @@ function fmtCard(inp){
   var v=inp.value.replace(/\D/g,'').substring(0,16);
   inp.value=v.replace(/(.{4})/g,'$1 ').trim();
 }
+
+// ─── TRAINERS ────────────────────────────────────────────
+var TRAINERS = [
+  { id:1, name:'Layla Hassan',     initials:'LH', color:'#A855F7', title:'Senior Fitness Trainer',
+    tags:['HIIT','Strength','Yoga'], bio:'7 years of experience in functional training and HIIT. Specialises in body transformation and strength building for women.',
+    rating:'4.9', sessions:'312', members:'24', online:true },
+  { id:2, name:'Nour Al-Rashid',   initials:'NR', color:'#EC4899', title:'Pilates & Dance Coach',
+    tags:['Pilates','Dance Fitness','Flexibility'], bio:'Certified Pilates instructor and Zumba coach with a passion for making fitness fun and accessible for all levels.',
+    rating:'4.8', sessions:'198', members:'18', online:true },
+  { id:3, name:'Reem Khalid',      initials:'RK', color:'#F59E0B', title:'CrossFit & Boxing Coach',
+    tags:['CrossFit','Boxing','Cardio'], bio:'Former national-level athlete now training women in CrossFit and boxing. High-energy, results-driven sessions.',
+    rating:'4.7', sessions:'241', members:'20', online:true },
+  { id:4, name:'Maya Haddad',      initials:'MH', color:'#22C55E', title:'Wellness & Yoga Coach',
+    tags:['Yoga','Meditation','Stretching'], bio:'Holistic wellness coach combining yoga, breath work and mindfulness to help members reduce stress and improve flexibility.',
+    rating:'4.9', sessions:'175', members:'15', online:false },
+];
+var _activeTrainerFilter = 'all';
+var _bookingTrainer = null;
+
+function renderTrainers() {
+  var filtered = _activeTrainerFilter === 'all'
+    ? TRAINERS
+    : TRAINERS.filter(function(t){ return t.tags.some(function(tag){ return tag.toLowerCase().indexOf(_activeTrainerFilter.toLowerCase()) > -1; }); });
+  var el = document.getElementById('trainer-cards');
+  if (!el) return;
+  if (!filtered.length) { el.innerHTML = '<div style="color:var(--g3);font-size:13px;padding:20px 0">No trainers found for this specialty.</div>'; return; }
+  el.innerHTML = filtered.map(function(t) {
+    return '<div class="trainer-card" data-tags="'+t.tags.join(',')+'">'+
+      '<div class="trainer-header">'+
+        '<div class="trainer-av" style="background:'+t.color+'">'+t.initials+'</div>'+
+        '<div style="flex:1">'+
+          '<div class="trainer-name">'+t.name+'</div>'+
+          '<div class="trainer-title">'+t.title+'</div>'+
+        '</div>'+
+        '<div class="trainer-status '+(t.online?'online':'offline')+'">'+
+          '<div style="width:5px;height:5px;border-radius:50%;background:currentColor"></div>'+
+          (t.online?'Available':'Offline')+
+        '</div>'+
+      '</div>'+
+      '<div class="trainer-tags">'+t.tags.map(function(tag){ return '<span class="trainer-tag">'+tag+'</span>'; }).join('')+'</div>'+
+      '<div class="trainer-bio">'+t.bio+'</div>'+
+      '<div class="trainer-stats">'+
+        '<div class="trainer-stat"><div class="trainer-stat-val">'+t.rating+'</div><div class="trainer-stat-lbl">Rating</div></div>'+
+        '<div class="trainer-stat"><div class="trainer-stat-val">'+t.sessions+'</div><div class="trainer-stat-lbl">Sessions</div></div>'+
+        '<div class="trainer-stat"><div class="trainer-stat-val">'+t.members+'</div><div class="trainer-stat-lbl">Members</div></div>'+
+      '</div>'+
+      '<button class="checkout-btn" style="margin-top:4px" onclick="openTrainerBooking('+t.id+')">'+
+        '<i class="ti ti-calendar-plus"></i> Book a session'+
+      '</button>'+
+    '</div>';
+  }).join('');
+}
+
+function filterTrainers(tag, btn) {
+  _activeTrainerFilter = tag;
+  document.querySelectorAll('.trainer-filter').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderTrainers();
+}
+
+function openTrainerBooking(id) {
+  _bookingTrainer = TRAINERS.find(function(t){ return t.id === id; });
+  if (!_bookingTrainer) return;
+  document.getElementById('book-trainer-title').textContent = 'Book with '+_bookingTrainer.name;
+  document.getElementById('book-trainer-sub').textContent = _bookingTrainer.title+' · '+_bookingTrainer.tags.join(', ');
+  var dateEl = document.getElementById('book-trainer-date');
+  if (dateEl) { var d = new Date(); d.setDate(d.getDate()+1); dateEl.value = d.toISOString().split('T')[0]; }
+  document.querySelectorAll('#trainer-time-slots .time-slot').forEach(function(s){ s.classList.remove('selected'); });
+  openModal('modal-book-trainer');
+}
+
+function selectTrainerSlot(el) {
+  document.querySelectorAll('#trainer-time-slots .time-slot').forEach(function(s){ s.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function confirmTrainerBooking() {
+  if (!_bookingTrainer) return;
+  var slot = document.querySelector('#trainer-time-slots .time-slot.selected');
+  var date = document.getElementById('book-trainer-date').value;
+  if (!slot) { toast('Please select a time slot','error'); return; }
+  if (!date) { toast('Please select a date','error'); return; }
+  closeModal('modal-book-trainer');
+  toast('Session booked with '+_bookingTrainer.name+' on '+date+' at '+slot.textContent,'success');
+  addNotif('Session booked with '+_bookingTrainer.name+' on '+date+' at '+slot.textContent+'.','blue');
+  state.activityLog.unshift({type:'tr',date:date,desc:'Booked session: '+_bookingTrainer.name+' · '+slot.textContent});
+}
+
+document.addEventListener('DOMContentLoaded', function(){ renderTrainers(); });
 </script>
 </body>
 </html>

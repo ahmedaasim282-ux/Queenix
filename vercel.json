@@ -3,8 +3,9 @@
   "trailingSlash": false,
   "routes": [
     { "src": "/",        "dest": "/index.html"  },
-    { "src": "/member",  "dest": "/member.html" },
-    { "src": "/admin",   "dest": "/admin.html"  },
-    { "src": "/login",   "dest": "/index.html"  }
+    { "src": "/member",  "dest": "/member.html"  },
+    { "src": "/admin",   "dest": "/admin.html"   },
+    { "src": "/trainer", "dest": "/trainer.html" },
+    { "src": "/login",   "dest": "/index.html"   }
   ]
 }
