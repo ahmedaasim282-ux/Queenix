@@ -231,12 +231,24 @@ const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
   sessionStorage.setItem('qx_name', name);
   const fname = name.split(' ')[0];
   const initials = name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+  const OWNER_ONLY_PAGES = ['staff','shifts','revenue','memberships','reports'];
+
   document.addEventListener('DOMContentLoaded', function() {
     var av = document.querySelector('.staff-chip-av');
     if (av) av.textContent = initials || 'ME';
     var chip = document.querySelector('.staff-chip span');
     if (chip) chip.textContent = (role === 'owner' ? 'Owner' : 'Manager') + ' · ' + fname;
+
+    // Hide owner-only sidebar items for ops
+    if (role !== 'owner') {
+      document.querySelectorAll('.owner-only').forEach(function(el) { el.style.display = 'none'; });
+    }
   });
+
+  // Block owner-only pages for ops role
+  window._ownerOnlyPages = OWNER_ONLY_PAGES;
+  window._currentRole = role;
 
   // Override the logout function to use Supabase signOut
   window._supabaseLogout = async function() {
@@ -278,15 +290,15 @@ const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
   <a class="sb-item" onclick="goTo('classes')"><i class="ti ti-barbell"></i>Classes</a>
   <a class="sb-item" onclick="goTo('orders')"><i class="ti ti-coffee"></i>Coffee orders<span class="sb-badge" id="orders-badge">3</span></a>
   <a class="sb-item" onclick="goTo('salon')"><i class="ti ti-scissors"></i>Salon bookings</a>
-  <div class="sb-divider"></div>
-  <div class="sb-label">People</div>
-  <a class="sb-item" onclick="goTo('staff')"><i class="ti ti-id-badge"></i>Staff management</a>
-  <a class="sb-item" onclick="goTo('shifts')"><i class="ti ti-calendar"></i>Shifts & rota</a>
-  <div class="sb-divider"></div>
-  <div class="sb-label">Business</div>
-  <a class="sb-item" onclick="goTo('revenue')"><i class="ti ti-chart-bar"></i>Revenue</a>
-  <a class="sb-item" onclick="goTo('memberships')"><i class="ti ti-crown"></i>Memberships</a>
-  <a class="sb-item" onclick="goTo('reports')"><i class="ti ti-report-analytics"></i>Reports</a>
+  <div class="sb-divider owner-only"></div>
+  <div class="sb-label owner-only">People</div>
+  <a class="sb-item owner-only" onclick="goTo('staff')"><i class="ti ti-id-badge"></i>Staff management</a>
+  <a class="sb-item owner-only" onclick="goTo('shifts')"><i class="ti ti-calendar"></i>Shifts & rota</a>
+  <div class="sb-divider owner-only"></div>
+  <div class="sb-label owner-only">Business</div>
+  <a class="sb-item owner-only" onclick="goTo('revenue')"><i class="ti ti-chart-bar"></i>Revenue</a>
+  <a class="sb-item owner-only" onclick="goTo('memberships')"><i class="ti ti-crown"></i>Memberships</a>
+  <a class="sb-item owner-only" onclick="goTo('reports')"><i class="ti ti-report-analytics"></i>Reports</a>
 </aside>
 
 <!-- MAIN -->
@@ -858,6 +870,11 @@ const _sb = supabase.createClient(_SUPABASE_URL, _SUPABASE_ANON);
 
 <script>
 function goTo(page) {
+  // Block owner-only pages for ops role
+  if (window._currentRole !== 'owner' && window._ownerOnlyPages && window._ownerOnlyPages.indexOf(page) > -1) {
+    showToast('This section is restricted to the Owner portal.');
+    return;
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
